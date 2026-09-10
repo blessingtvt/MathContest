@@ -1,0 +1,370 @@
+{
+  "schema_version": 1,
+  "raw_files": [
+    {
+      "name": "附件1.xlsx",
+      "path": "data_raw/附件1.xlsx",
+      "size_bytes": 16003,
+      "sha256": "66b87134f5ecccd68184d3539bb1293ef039f9e0fdd955a589b9bfa7f227c377"
+    },
+    {
+      "name": "附件2.xlsx",
+      "path": "data_raw/附件2.xlsx",
+      "size_bytes": 907128,
+      "sha256": "2e95fd446bfafa0d8c59577b5c2e2ea8b3f1def20dde54a3062556f4da9b4c72"
+    },
+    {
+      "name": "附件3.xlsx",
+      "path": "data_raw/附件3.xlsx",
+      "size_bytes": 293526,
+      "sha256": "8a61b06c52bd0d639a1cc37c61a7d9f5b75edcbca718f64c1bd3498ec9f9d843"
+    },
+    {
+      "name": "附件4.xlsx",
+      "path": "data_raw/附件4.xlsx",
+      "size_bytes": 409790,
+      "sha256": "20e9c93aeab5e8e21ae4dd15587f9e190f7408692504c1319598461cd654fe71"
+    },
+    {
+      "name": "附件5/result1.xlsx",
+      "path": "data_raw/附件5/result1.xlsx",
+      "size_bytes": 13323,
+      "sha256": "28360e0974e7d6065394a8aba4e14a86773ae0036cc7d3ea1b211b515b03d688"
+    },
+    {
+      "name": "附件5/result2.xlsx",
+      "path": "data_raw/附件5/result2.xlsx",
+      "size_bytes": 18397,
+      "sha256": "1c26494cfc6d754e0bd9bff7e13e1126a73d2d2da6c5336eb251d89b9a1a1a47"
+    },
+    {
+      "name": "附件5/result3.xlsx",
+      "path": "data_raw/附件5/result3.xlsx",
+      "size_bytes": 265429,
+      "sha256": "c59da470cabd0be23f602c95c8aa9d11ec224a0cdac216b3e1f218e65d006bdc"
+    },
+    {
+      "name": "附件5/result4-2.xlsx",
+      "path": "data_raw/附件5/result4-2.xlsx",
+      "size_bytes": 18397,
+      "sha256": "1c26494cfc6d754e0bd9bff7e13e1126a73d2d2da6c5336eb251d89b9a1a1a47"
+    },
+    {
+      "name": "附件5/result4-3.xlsx",
+      "path": "data_raw/附件5/result4-3.xlsx",
+      "size_bytes": 265429,
+      "sha256": "c59da470cabd0be23f602c95c8aa9d11ec224a0cdac216b3e1f218e65d006bdc"
+    }
+  ],
+  "attachment_mapping": [
+    {
+      "attachment": "附件1",
+      "content": "代表日(年均)电价/负载/光伏预测",
+      "maps_to": [
+        "Q1"
+      ],
+      "role": "输入"
+    },
+    {
+      "attachment": "附件1",
+      "content": "电价曲线(恒定)",
+      "maps_to": [
+        "Q2",
+        "Q3"
+      ],
+      "role": "输入(仅电价)"
+    },
+    {
+      "attachment": "附件2",
+      "content": "全年实际负载/光伏",
+      "maps_to": [
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "role": "输入(实际结算)"
+    },
+    {
+      "attachment": "附件3",
+      "content": "滚动光伏预报(0/6/12/18)",
+      "maps_to": [
+        "Q3",
+        "Q4"
+      ],
+      "role": "输入(预报)"
+    },
+    {
+      "attachment": "附件4",
+      "content": "全年波动电价",
+      "maps_to": [
+        "Q4"
+      ],
+      "role": "输入(电价)"
+    },
+    {
+      "attachment": "附件5/result1",
+      "maps_to": [
+        "Q1"
+      ],
+      "role": "输出模板"
+    },
+    {
+      "attachment": "附件5/result2",
+      "maps_to": [
+        "Q2"
+      ],
+      "role": "输出模板"
+    },
+    {
+      "attachment": "附件5/result3",
+      "maps_to": [
+        "Q3"
+      ],
+      "role": "输出模板"
+    },
+    {
+      "attachment": "附件5/result4-2",
+      "maps_to": [
+        "Q4(对应Q2)"
+      ],
+      "role": "输出模板"
+    },
+    {
+      "attachment": "附件5/result4-3",
+      "maps_to": [
+        "Q4(对应Q3)"
+      ],
+      "role": "输出模板"
+    }
+  ],
+  "fields": [
+    {
+      "field": "附件1.time",
+      "unit": "10min标签",
+      "type": "categorical",
+      "cardinality": 144
+    },
+    {
+      "field": "附件1.price",
+      "unit": "元/kWh",
+      "type": "numeric",
+      "stats": {
+        "n": 144,
+        "min": 0.3713,
+        "max": 1.3952,
+        "mean": 0.7661972222222223,
+        "std": 0.3132920983382326
+      }
+    },
+    {
+      "field": "附件1.load",
+      "unit": "kW",
+      "type": "numeric",
+      "stats": {
+        "n": 144,
+        "min": 3309.3934,
+        "max": 5958.9696,
+        "mean": 4626.0336708333325,
+        "std": 977.4711321355107
+      }
+    },
+    {
+      "field": "附件1.pv_forecast",
+      "unit": "kW",
+      "type": "numeric",
+      "stats": {
+        "n": 144,
+        "min": 0.0,
+        "max": 7612.316,
+        "mean": 2311.7848194444446,
+        "std": 2854.400161899623
+      },
+      "nonzero": 89
+    },
+    {
+      "field": "附件2.load",
+      "unit": "kW",
+      "type": "numeric",
+      "stats": {
+        "n": 52560,
+        "min": 1995.7176,
+        "max": 7978.8849,
+        "mean": 4626.033670125571,
+        "std": 1411.7323875406
+      },
+      "shape": [
+        365,
+        144
+      ]
+    },
+    {
+      "field": "附件2.pv",
+      "unit": "kW",
+      "type": "numeric",
+      "stats": {
+        "n": 52560,
+        "min": 0.0,
+        "max": 10216.2,
+        "mean": 2311.7857090962707,
+        "std": 2948.6386878814424
+      },
+      "shape": [
+        365,
+        144
+      ],
+      "nonzero": 29020
+    },
+    {
+      "field": "附件3.forecast_power",
+      "unit": "kW",
+      "type": "numeric",
+      "stats": {
+        "n": 35040,
+        "min": 0.0,
+        "max": 9995.8875,
+        "mean": 2279.8011315325343,
+        "std": 2934.0137945183233
+      },
+      "shape": [
+        1460,
+        24
+      ],
+      "nonzero": 17515,
+      "note": "前向填充合并日期；issue_time∈{0:00,6:00,12:00,18:00}；forecast_hour 1..24"
+    },
+    {
+      "field": "附件4.price",
+      "unit": "元/kWh",
+      "type": "numeric",
+      "stats": {
+        "n": 52560,
+        "min": 0.0076,
+        "max": 1.7936,
+        "mean": 0.7661976046423136,
+        "std": 0.3406700960727655
+      },
+      "shape": [
+        365,
+        144
+      ]
+    }
+  ],
+  "quality": {
+    "missingness": {
+      "附件1": 0,
+      "附件2.load": 0,
+      "附件2.pv": 0,
+      "附件3": 0,
+      "附件4": 0
+    },
+    "duplicates": {
+      "附件3.(date,issue)原始重复": 0,
+      "附件2/4日期重复": 0
+    },
+    "impossible_values": {
+      "附件1.负值(price/load/pv)": 0,
+      "附件2.负值(load/pv)": 0,
+      "附件3.负值": 0,
+      "附件4.price<=0": 0
+    },
+    "outliers": {
+      "附件1.price(IQR)": 0,
+      "附件1.load(IQR)": 0,
+      "附件2.load(IQR)": 0,
+      "附件2.pv(IQR)": 0,
+      "附件4.price(IQR)": 0,
+      "note": "夜间光伏=0为正常非离群；电价0.0076为极端低价(波动电价特性)"
+    }
+  },
+  "coverage": {
+    "附件1": {
+      "rows": 144,
+      "intervals": 144,
+      "time_range": "0:10 ~ 24:00(单日)"
+    },
+    "附件2": {
+      "days": 365,
+      "intervals_per_day": 144,
+      "date_range": [
+        "2025-01-01 00:00:00",
+        "2025-12-31 00:00:00"
+      ]
+    },
+    "附件3": {
+      "records": 35040,
+      "days": 365,
+      "issues_per_day": 4,
+      "date_range": [
+        "2025-1-1",
+        "2025-12-31"
+      ]
+    },
+    "附件4": {
+      "days": 365,
+      "intervals_per_day": 144,
+      "date_range": [
+        "2025-01-01 00:00:00",
+        "2025-12-31 00:00:00"
+      ]
+    },
+    "note": "2025全年连续，无日期缺口；附件2/3/4日期均为2025-01-01~2025-12-31(365天)"
+  },
+  "distribution_risks": {},
+  "per_question_readiness": {
+    "Q1": {
+      "status": "ready",
+      "fields": [
+        "附件1.price",
+        "附件1.load",
+        "附件1.pv_forecast",
+        "附录1参数"
+      ]
+    },
+    "Q2": {
+      "status": "ready_with_warnings",
+      "fields": [
+        "附件1.price",
+        "附件2.load",
+        "附件2.pv",
+        "附录1参数"
+      ],
+      "warning": "计划信息集(完美预见与否)待HD3确认"
+    },
+    "Q3": {
+      "status": "ready_with_warnings",
+      "fields": [
+        "附件1.price",
+        "附件2.load",
+        "附件2.pv",
+        "附件3.forecast",
+        "附录1参数"
+      ],
+      "warning": "整点预报→10min区间需插值(HD/S8)；计费口径待HD4确认"
+    },
+    "Q4": {
+      "status": "ready_with_warnings",
+      "fields": [
+        "附件4.price",
+        "附件2.load",
+        "附件2.pv",
+        "附件3.forecast",
+        "附录1参数"
+      ],
+      "warning": "波动电价含极低价(0.0076)，需核对储能套利边界"
+    }
+  },
+  "cleaned_files": [
+    "data_clean/附件1_clean.csv",
+    "data_clean/附件2_load_clean.csv",
+    "data_clean/附件2_pv_clean.csv",
+    "data_clean/附件3_clean.csv",
+    "data_clean/附件4_clean.csv",
+    "data_clean/cleaned_data.pkl"
+  ],
+  "unresolved_risks": [
+    "附件3为整点(1h)预报，负载/光伏/电价为10min粒度，需约定插值/阶梯映射(S8)",
+    "附件1=年均代表日(负载精确=附件2均值，电价=附件4均值)，Q1结果仅代表典型日",
+    "Q2完美预见假设下紧急购电机制在最优解≈0，其意义由HD3决定",
+    "电价极端值0.0076元/kWh与1.7936元/kWh并存，波动大，影响储能套利策略稳定性"
+  ]
+}

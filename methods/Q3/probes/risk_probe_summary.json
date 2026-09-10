@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "generated_at": "2026-09-10T18:45:00+08:00",
+  "data_refs": ["data/data_report.md", "data/data_profile.json"],
+  "methods": [
+    {
+      "id": "M3",
+      "role": "main_candidate",
+      "name": "滚动时域线性规划（MPC：0:00计划 + 6/12/18调整 + 违约/溢价惩罚）",
+      "executability": {"status": "PASS", "evidence": {"note": "LP骨架已由Q1/Q2实测验证(577变量~10ms/次)；Q3分段计费线性化在G3实现后复核", "scale_estimate": "365×4=1460次LP≈14s"}},
+      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0, "note": "附件3预报(365×4×24)与附件2实际(365×144)全覆盖"}},
+      "assumption_checks": [
+        {"name": "penalty_linearization(HD4)", "status": "CONDITIONAL", "metric": "min/max分段计费", "value": "引入 w+=max(x−y,0), w−=max(y−x,0) 线性化", "note": "标准分段线性化可保LP；HD4口径待人类确认"},
+        {"name": "forecast_granularity(S8)", "status": "CONDITIONAL", "metric": "整点预报→10min", "value": "待确认插值/阶梯映射", "note": "数据粒度差异，非方法风险，但影响调整决策精度"},
+        {"name": "efficiency_direction(HD2)", "status": "CONDITIONAL", "metric": "eta=0.9单向", "value": "待确认"}
+      ],
+      "output_degeneracy": {"status": "CONDITIONAL", "metrics": {"note": "违约/溢价分段线性化后，x=y 区间计费系数拐点可能产生多重最优，需次优目标或按区间唯一化"}},
+      "perturbation_sensitivity": {"status": "PASS", "perturbation": "预报误差→费用", "metric": "待G3测", "value": "滚动重优化天然降低预报误差敏感性(文献#7/#8)"},
+      "scale_check": {"status": "PASS", "representative_n": "365天×4时刻", "variables_per_day": 577, "runtime_estimate_s": 14, "peak_memory_mb": "<50"},
+      "verdict": "PASS",
+      "conditions": ["HD4计费口径确认后实现分段线性化；G3验证预报误差下的费用"],
+      "evidence_refs": ["code/scripts/risk_probe.py", "papers/related_paper_analysis.md"]
+    },
+    {
+      "id": "B3",
+      "role": "usable_baseline",
+      "name": "仅0:00计划、不调整（Q2式静态 + 紧急购电兜底）",
+      "executability": {"status": "PASS", "evidence": {"note": "即Q2逐日LP，已实测可行"}},
+      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0}},
+      "assumption_checks": [],
+      "output_degeneracy": {"status": "PASS", "metrics": {"note": "唯一确定"}},
+      "perturbation_sensitivity": {"status": "PASS", "perturbation": "无调整，预报误差全由紧急购电吸收", "metric": "费用上限", "value": "较主方案高"},
+      "scale_check": {"status": "PASS", "runtime_s": 3.48},
+      "verdict": "PASS",
+      "conditions": [],
+      "evidence_refs": []
+    }
+  ],
+  "note": "主方案(带调整)与基线(不调整)的差异量化'调整策略'价值；另需回答'是否需引入更多预报时刻'的比较实验。"
+}

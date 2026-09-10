@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "rigor_profile": "lean",
+  "current_gate": "G4",
+  "status": "results_frozen_waiting_human",
+  "artifacts": {
+    "parse": "planning/parse/problem_parse.json",
+    "classification": "planning/classification/problem_classification.json",
+    "symbol_table": "planning/symbol_table.md",
+    "model_assumptions": "planning/model_assumptions.md",
+    "data_profile": "data/data_profile.json",
+    "method_card": "methods/Q4/q4_method_card.md",
+    "decision_ledger": "methods/Q4/q4_decisions.jsonl",
+    "risk_probe": "methods/Q4/probes/risk_probe_summary.json",
+    "code_plan": "code/Q4/q4_code_plan.md",
+    "code_review": "code/Q4/reviews/q4_python_review.json",
+    "final_method_explanation": "methods/Q4/q4_final_method_explanation.md",
+    "latest_run": "results/Q4/experiments/round1/run_summary.json",
+    "frozen_numbers": "results/Q4/reports/frozen_numbers.json"
+  },
+  "allowed": { "code_generation": true, "freeze": true, "paper_writing": false, "final_assembly": false },
+  "blockers": [],
+  "assumption_notes": "继承 HD3/HD4；波动电价口径已核（附件4均值≈附件1）",
+  "next_action": { "owner": "human", "skill": "workflow-orchestrator", "reason": "G4 冻结完成，待人类确认后进入 G5-G6 论文写作与三重审计" },
+  "updated_at": "2026-09-10T21:00:00+08:00"
+}

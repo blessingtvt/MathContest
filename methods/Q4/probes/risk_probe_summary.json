@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "generated_at": "2026-09-10T18:45:00+08:00",
+  "data_refs": ["data/data_report.md", "data/data_profile.json"],
+  "methods": [
+    {
+      "id": "M4",
+      "role": "main_candidate",
+      "name": "波动电价 LP/MPC（将 p_t 替换为 p_{d,t} 重解 Q2/Q3）",
+      "executability": {"status": "PASS", "evidence": {"note": "仅费用函数电价变化，LP/MPC骨架已由Q1-Q3验证；波动电价含极端低值0.0076元/kWh"}},
+      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0, "note": "附件4电价365×144全覆盖；price<0.1占0.053%、>1.5占1.764%"}},
+      "assumption_checks": [
+        {"name": "price_extreme(0.0076)", "status": "CONDITIONAL", "metric": "极端低价", "value": "0.0076元/kWh", "note": "可能诱导储能极端套利，G3需扰动检验"},
+        {"name": "inherits_HD3_HD4", "status": "CONDITIONAL", "metric": "同Q2/Q3口径", "value": "待确认"}
+      ],
+      "output_degeneracy": {"status": "CONDITIONAL", "metrics": {"note": "波动电价下多区间价格并列更常见，解退化风险略升，需次优目标"}},
+      "perturbation_sensitivity": {"status": "PASS", "perturbation": "电价±5%", "metric": "费用Δ%", "value": "线性(参考Q1)"},
+      "scale_check": {"status": "PASS", "representative_n": "365天", "variables_per_day": 577, "runtime_estimate_s": "≈3.5s(Q2)+14s(Q3)", "peak_memory_mb": "<50"},
+      "verdict": "PASS",
+      "conditions": ["极端电价下的套利稳定性需G3验证；HD3/HD4口径确认后统一"],
+      "evidence_refs": ["code/scripts/risk_probe.py"]
+    },
+    {
+      "id": "B4",
+      "role": "usable_baseline",
+      "name": "波动电价无储能基准",
+      "executability": {"status": "PASS", "evidence": {"note": "纯算术，x_t=max(L·Δt−G·Δt,0)，费用=Σ p_{d,t}x_t"}},
+      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0}},
+      "assumption_checks": [],
+      "output_degeneracy": {"status": "PASS", "metrics": {"note": "唯一确定"}},
+      "perturbation_sensitivity": {"status": "PASS", "perturbation": "线性", "metric": "N/A", "value": "线性"},
+      "scale_check": {"status": "PASS", "runtime_s": 0.0},
+      "verdict": "PASS",
+      "conditions": [],
+      "evidence_refs": []
+    }
+  ],
+  "note": "波动电价下储能套利空间更大(低价0.0076→高价1.79)，主/基线差异预计高于恒定电价场景。"
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "question_id": "Q1",
+  "experiment_id": "round1",
+  "method": "M1-LP",
+  "seed": 2026,
+  "status": "success",
+  "created_at": "2026-09-10T20:34:43.554260",
+  "data_sources": [
+    "data_clean/cleaned_data.pkl"
+  ],
+  "terminal": {
+    "E0": 6000.0,
+    "E_T": 6000.0,
+    "constraint": "E0=ET"
+  },
+  "main": {
+    "method_id": "M1",
+    "objective_name": "全天购电费(元)",
+    "objective_value": 35126.9486,
+    "total_purchase_kwh": 59482.699,
+    "total_charge_kwh": 20740.6661,
+    "total_discharge_kwh": 16799.9396,
+    "outputs": [
+      "results/Q1/result1.xlsx"
+    ]
+  },
+  "baselines": [
+    {
+      "id": "B1",
+      "name": "无储能",
+      "objective_value": 48052.0466
+    },
+    {
+      "id": "R1",
+      "name": "规则套利",
+      "objective_value": 46143.0792,
+      "terminal_E_kwh": 10800.0
+    }
+  ],
+  "metrics": {
+    "储能价值_元": 12925.098,
+    "储能价值_占比": 0.268981,
+    "优化价值_元": 11016.1306
+  }
+}

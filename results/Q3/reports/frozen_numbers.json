@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "frozen_at": "2026-09-10T20:56:10.809019",
+  "method": "M3-MPC",
+  "seed": 2026,
+  "period": "2025-02-01 ~ 2025-12-31",
+  "objective": {
+    "name": "报告期总购电费(元, 含违约/溢价/紧急)",
+    "unit": "元",
+    "value": 16972663.03
+  },
+  "cost_breakdown": {
+    "plan_cost_yuan": 12267607.43,
+    "penalty_cost_yuan": 533502.66,
+    "emergency_cost_yuan": 4171552.94
+  },
+  "baselines": [
+    {
+      "id": "B3",
+      "name": "静态不调整",
+      "objective_value": 17400028.28
+    },
+    {
+      "id": "R3",
+      "name": "规则套利",
+      "objective_value": 18065256.61
+    }
+  ],
+  "metrics": {
+    "调整价值_元": 427365.25,
+    "优化价值_元": 1092593.58
+  }
+}

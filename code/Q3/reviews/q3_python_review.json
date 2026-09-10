@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "reviewer": "python-code-reviewer",
+  "language": "python",
+  "files_reviewed": ["code/common.py", "code/Q3/q3_main.py", "code/Q3/q3_baseline.py"],
+  "created_at": "2026-09-10",
+  "verdict": "pass",
+  "checks": [
+    {
+      "id": "syntax",
+      "name": "语法/可执行性",
+      "status": "pass",
+      "evidence": "q3_main.py 与 q3_baseline.py 均运行成功；每日 4 阶段 LP/贪心全部收敛，无异常。"
+    },
+    {
+      "id": "semantics",
+      "name": "代码语义",
+      "status": "pass",
+      "evidence": "stage_lp 用 u（计划内, 系数 0.5p）与 v（溢价, 系数 1.5p）分解 y；能量平衡 -u-v-q+c <= pv*dt-load*dt；结算 z 用实际光伏（pv_actual）与最终方案 y_final/c_final/q_final。"
+    },
+    {
+      "id": "logic",
+      "name": "逻辑正确性",
+      "status": "pass",
+      "evidence": "分段计费线性化等价：min Σp(0.5u+1.5v) 且 u≤x_plan 使 u*=min(y,x_plan)、v*=max(y−x_plan,0)，还原 p·(min+0.5·违约+1.5·溢价)。数值核验 day150：z 与 max(−gap,0) 一致（allclose），紧急购电恰好补齐实际缺口。"
+    },
+    {
+      "id": "boundary",
+      "name": "边界/极限",
+      "status": "pass",
+      "evidence": "调整时段拼接 sl∈{36,72,108}，y_final 恒为 144 长；预报映射 forecast_intervals：区间 t（小时 t//6）→ forecast[d*4+s, t//6−6s]，覆盖小时 [6s,24)；紧急购电 clip0 保证 z≥0。"
+    },
+    {
+      "id": "input_contract",
+      "name": "输入契约",
+      "status": "pass",
+      "evidence": "仅读取 data_clean/cleaned_data.pkl（附件1.price、附件2_load/pv、附件3.forecast），未修改 data_raw；负荷恒用实际值、光伏按滚动预报+实际值结算。"
+    },
+    {
+      "id": "output_contract",
+      "name": "输出契约",
+      "status": "pass",
+      "evidence": "result3.xlsx 含「计划购电量」「调整购电量」「充放电量」「紧急购电量」四 sheet，均为 335×147/334 天；紧急购电量 sheet 仅写 z>0 的稀疏行。run_summary.json（含 plan/penalty/emergency 三段分解）、baseline_metrics.json 落盘。"
+    },
+    {
+      "id": "method_alignment",
+      "name": "方法对齐",
+      "status": "pass",
+      "evidence": "M3=滚动 MPC（G2 批准）；B3=静态不调整（q3_static_day）；R3=rule_mpc_day（滚动预报+同计费，与 M3 同信息可比）。"
+    },
+    {
+      "id": "reproducibility",
+      "name": "可复现性",
+      "status": "pass",
+      "evidence": "SEED=2026；确定性 LP/贪心，无随机量；跨日结转 E 确定性。"
+    }
+  ],
+  "numeric_verification": {
+    "objective_value": 16972663.03,
+    "plan_cost": 12267607.43,
+    "penalty_cost": 533502.66,
+    "emergency_cost": 4171552.94,
+    "baseline_B3": 17400028.28,
+    "baseline_R3": 18065256.61,
+    "adjustment_value_yuan": 427365.25,
+    "optimization_value_yuan": 1092593.58,
+    "day150_z_matches_gap": true
+  },
+  "issues": [],
+  "notes": [
+    "MPC 阶段间储能状态沿用计划轨迹（不引入 6/12/18 点的实际状态重观测），为简化假设，M3/R3 一致，不影响可比性。",
+    "目标值 = plan + penalty + emergency 三段闭合（16972663.03 = 12267607.43 + 533502.66 + 4171552.94）。"
+  ]
+}

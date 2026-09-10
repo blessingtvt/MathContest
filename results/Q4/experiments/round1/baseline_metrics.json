@@ -1,0 +1,18 @@
+{
+  "question_id": "Q4",
+  "seed": 2026,
+  "created_at": "2026-09-10T20:40:36.784322",
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "baselines": [
+    {
+      "id": "B4",
+      "name": "无储能(波动电价)",
+      "objective_value": 17026782.86
+    },
+    {
+      "id": "R4",
+      "name": "规则套利(波动电价)",
+      "objective_value": 15787532.26
+    }
+  ]
+}

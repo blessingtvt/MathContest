@@ -1,0 +1,20 @@
+{
+  "question_id": "Q1",
+  "seed": 2026,
+  "created_at": "2026-09-10T20:35:37.753567",
+  "baselines": [
+    {
+      "id": "B1",
+      "name": "无储能",
+      "objective_value": 48052.0466,
+      "total_purchase_kwh": 61789.9354
+    },
+    {
+      "id": "R1",
+      "name": "规则套利",
+      "objective_value": 46143.0792,
+      "total_purchase_kwh": 73309.1628,
+      "terminal_E_kwh": 10800.0
+    }
+  ]
+}

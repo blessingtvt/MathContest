@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "experiment_id": "round1",
+  "method": "M3-MPC",
+  "seed": 2026,
+  "status": "success",
+  "created_at": "2026-09-10T20:39:48.809299",
+  "data_sources": [
+    "data_clean/cleaned_data.pkl"
+  ],
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "main": {
+    "method_id": "M3",
+    "objective_name": "报告期总购电费(元, 含违约/溢价/紧急)",
+    "objective_value": 16972663.03,
+    "plan_cost": 12267607.43,
+    "penalty_cost": 533502.66,
+    "emergency_cost": 4171552.94,
+    "outputs": [
+      "results/Q3/result3.xlsx"
+    ]
+  },
+  "baselines": [
+    {
+      "id": "B3",
+      "name": "静态不调整",
+      "objective_value": 17400028.28
+    },
+    {
+      "id": "R3",
+      "name": "规则套利",
+      "objective_value": 18065256.61
+    }
+  ],
+  "metrics": {
+    "调整价值_元": 427365.25,
+    "优化价值_元": 1092593.58
+  }
+}

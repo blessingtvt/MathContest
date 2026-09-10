@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "question_id": "Q1",
+  "frozen_at": "2026-09-10T20:56:10.807146",
+  "method": "M1-LP",
+  "seed": 2026,
+  "period": "代表日(附件1, 144区间)",
+  "objective": {
+    "name": "全天购电费(元)",
+    "unit": "元",
+    "value": 35126.9486
+  },
+  "key_quantities": {
+    "total_purchase_kwh": 59482.699,
+    "total_charge_kwh": 20740.6661,
+    "total_discharge_kwh": 16799.9396,
+    "terminal_E0_kwh": 6000.0,
+    "terminal_ET_kwh": 6000.0
+  },
+  "baselines": [
+    {
+      "id": "B1",
+      "name": "无储能",
+      "objective_value": 48052.0466
+    },
+    {
+      "id": "R1",
+      "name": "规则套利",
+      "objective_value": 46143.0792,
+      "terminal_E_kwh": 10800.0
+    }
+  ],
+  "metrics": {
+    "储能价值_元": 12925.098,
+    "储能价值_占比": 0.268981,
+    "优化价值_元": 11016.1306
+  }
+}

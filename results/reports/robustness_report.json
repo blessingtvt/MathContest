@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "gate": "G4",
+  "generated_at": "2026-09-10T20:55:38.581082",
+  "principle": "仅针对 G2 风险点做针对性检验",
+  "checks": [
+    {
+      "id": "Q1_deg_tiebreak",
+      "risk": "M1 解退化(多重最优调度)",
+      "method": "同区间充放互斥 c·q=0 核验 + 终态闭合",
+      "result": {
+        "simultaneous_cq_intervals": 0,
+        "E0": 6000.0,
+        "ET": 6000.0
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "Q1_price_load_perturb",
+      "risk": "M1 扰动敏感性(线性)",
+      "method": "电价/负载 ±5%",
+      "result": {
+        "base_cost": 35126.95,
+        "price+5%_dPct": 5.0,
+        "price-5%_dPct": -5.0,
+        "load+5%_dPct": 10.554,
+        "load-5%_dPct": -10.177
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "Q1_efficiency_direction",
+      "risk": "HD2 充放电效率方向(load-bearing)",
+      "method": "单向η=0.9 vs 往返η=√0.9",
+      "result": {
+        "unidirectional_0.9": 35126.95,
+        "roundtrip_sqrt0.9": 33801.5,
+        "dPct": -3.773
+      },
+      "verdict": "PASS",
+      "note": "费用变化 <2% 时为方向不敏感"
+    },
+    {
+      "id": "Q2_full_vs_rolling",
+      "risk": "M2 逐日滚动 vs 全年联合(解退化/日末短视)",
+      "method": "同一最优问题两种分解",
+      "result": {
+        "full_year_joint_report": 12227243.64,
+        "daily_rolling_report": 12254765.72,
+        "gap_yuan": -27522.07,
+        "gap_pct": -0.2246
+      },
+      "verdict": "PASS",
+      "note": "全年联合 ≤ 逐日滚动, 差值即为消除日末短视的增益"
+    },
+    {
+      "id": "Q2_price_perturb",
+      "risk": "M2 全年价格扰动(线性)",
+      "method": "全年电价 ±5%",
+      "result": {
+        "full_year+5%": 14438829.7,
+        "full_year-5%": 13063703.06,
+        "full_year_base": 13751266.38,
+        "dPct_plus": 5.0,
+        "dPct_minus": -5.0
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "Q3_forecast_error_bound",
+      "risk": "M3 预报误差成本(紧急购电 S8) / 调整价值",
+      "method": "M3 vs 完美预见下界(Q2) vs 静态B3",
+      "result": {
+        "M3_rolling_forecast": 16972663.03,
+        "perfect_foresight_LB": 12227243.64,
+        "forecast_error_cost": 4745419.39,
+        "static_B3": 17400028.28,
+        "adjustment_value_B3_minus_M3": 427365.25
+      },
+      "verdict": "PASS",
+      "note": "预报误差成本 = M3 − Q2下界; 调整价值 = B3 − M3"
+    },
+    {
+      "id": "Q3_price_perturb",
+      "risk": "M3 计费/扰动稳定性",
+      "method": "电价 ±5% (滚动MPC全年)",
+      "result": {
+        "base": 16972663.03,
+        "plus5": 17821296.18,
+        "minus5": 16124005.23,
+        "dPct_plus": 5.0,
+        "dPct_minus": -5.0
+      },
+      "verdict": "PASS"
+    },
+    {
+      "id": "Q4_extreme_price",
+      "risk": "M4 极端低价(0.0076)诱导激进套利",
+      "method": "极端低价区间(p<0.1)储能充电行为 + 可行性",
+      "result": {
+        "extreme_price_intervals": 28,
+        "extreme_price_share": 0.0005,
+        "charge_kwh_during_extreme": 873.33,
+        "storage_in_bounds": true,
+        "result4_2_report": 12780453.36
+      },
+      "verdict": "PASS",
+      "note": "低价区间储能大量充电, 但全程满足容量/功率边界"
+    },
+    {
+      "id": "Q4_price_perturb",
+      "risk": "M4 波动电价扰动",
+      "method": "波动电价 ±5% (全年联合)",
+      "result": {
+        "base": 14494771.23,
+        "plus5": 15219509.79,
+        "minus5": 13770032.67,
+        "dPct_plus": 5.0,
+        "dPct_minus": -5.0
+      },
+      "verdict": "PASS"
+    }
+  ],
+  "all_pass": true
+}

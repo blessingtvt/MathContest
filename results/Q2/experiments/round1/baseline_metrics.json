@@ -1,0 +1,18 @@
+{
+  "question_id": "Q2",
+  "seed": 2026,
+  "created_at": "2026-09-10T20:40:31.338605",
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "baselines": [
+    {
+      "id": "B2",
+      "name": "无储能",
+      "objective_value": 16407319.63
+    },
+    {
+      "id": "R2",
+      "name": "规则套利",
+      "objective_value": 14947870.26
+    }
+  ]
+}

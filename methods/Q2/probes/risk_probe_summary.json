@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "question_id": "Q2",
+  "generated_at": "2026-09-10T18:45:00+08:00",
+  "data_refs": ["data/data_report.md", "data/data_profile.json"],
+  "methods": [
+    {
+      "id": "M2",
+      "role": "main_candidate",
+      "name": "逐日滚动线性规划（完美预见，储能跨日）",
+      "executability": {"status": "PASS", "evidence": {"runtime_year_s": 3.48, "feasible": true, "cost_year_yuan": 13778161.12, "note": "365天逐日LP全部可行"}},
+      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0, "days_used": 365, "note": "附件2实际负载/光伏365×144全覆盖"}},
+      "assumption_checks": [
+        {"name": "perfect_foresight(HD3)", "status": "CONDITIONAL", "metric": "计划信息集", "value": "默认完美预见", "note": "若HD3判定非完美预见→需切F2鲁棒/随机规划；完美预见下紧急购电z≈0"},
+        {"name": "storage_carryover", "status": "PASS", "metric": "跨日E连续", "value": "E_{d,T}→E_{d+1,0}", "note": "逐日LP状态传递无间断"},
+        {"name": "efficiency_direction(HD2)", "status": "CONDITIONAL", "metric": "eta=0.9单向", "value": "待确认"}
+      ],
+      "output_degeneracy": {"status": "CONDITIONAL", "metrics": {"unique_opt_cost": 13778161.12, "note": "连续LP逐日可能多重最优调度，费用唯一；紧急购电在完美预见下恒为0"}},
+      "perturbation_sensitivity": {"status": "PASS", "perturbation": "参考Q1：价格±5%→费用±5%，负载±5%→费用±10.6%", "metric": "线性", "value": "无放大/振荡"},
+      "scale_check": {"status": "PASS", "representative_n": 365, "variables_per_day": 577, "runtime_year_s": 3.48, "peak_memory_mb": "<50"},
+      "verdict": "PASS",
+      "conditions": ["HD3完美预见需人类确认；G3对解退化加次优目标"],
+      "evidence_refs": ["code/scripts/risk_probe.py"]
+    },
+    {
+      "id": "B2",
+      "role": "usable_baseline",
+      "name": "无储能基准（全年逐日 x_t=max(L·Δt−G·Δt,0)）",
+      "executability": {"status": "PASS", "evidence": {"cost_year_yuan": 18298592.37}},
+      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0}},
+      "assumption_checks": [],
+      "output_degeneracy": {"status": "PASS", "metrics": {"note": "唯一确定"}},
+      "perturbation_sensitivity": {"status": "PASS", "perturbation": "线性", "metric": "N/A", "value": "随价格/负载线性变化"},
+      "scale_check": {"status": "PASS", "runtime_s": 0.0},
+      "verdict": "PASS",
+      "conditions": [],
+      "evidence_refs": []
+    }
+  ],
+  "note": "储能较无储能全年节省约 452 万元（约24.7%）。"
+}

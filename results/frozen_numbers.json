@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-09-10T20:56:10.811045",
+  "seed": 2026,
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "note": "论文全部数值的唯一权威来源, 禁止手工编辑",
+  "parameters": {
+    "T": 144,
+    "delta_t_h": 0.16666666666666666,
+    "E_min_kwh": 1200.0,
+    "E_max_kwh": 10800.0,
+    "E0_kwh": 6000.0,
+    "P_max_kw": 5000.0,
+    "eta_c": 0.9,
+    "eta_d": 0.9,
+    "alpha_em": 5.0,
+    "beta_pen": 0.5,
+    "gamma_pre": 1.5
+  },
+  "results": {
+    "Q1": {
+      "schema_version": 1,
+      "question_id": "Q1",
+      "frozen_at": "2026-09-10T20:56:10.807146",
+      "method": "M1-LP",
+      "seed": 2026,
+      "period": "代表日(附件1, 144区间)",
+      "objective": {
+        "name": "全天购电费(元)",
+        "unit": "元",
+        "value": 35126.9486
+      },
+      "key_quantities": {
+        "total_purchase_kwh": 59482.699,
+        "total_charge_kwh": 20740.6661,
+        "total_discharge_kwh": 16799.9396,
+        "terminal_E0_kwh": 6000.0,
+        "terminal_ET_kwh": 6000.0
+      },
+      "baselines": [
+        {
+          "id": "B1",
+          "name": "无储能",
+          "objective_value": 48052.0466
+        },
+        {
+          "id": "R1",
+          "name": "规则套利",
+          "objective_value": 46143.0792,
+          "terminal_E_kwh": 10800.0
+        }
+      ],
+      "metrics": {
+        "储能价值_元": 12925.098,
+        "储能价值_占比": 0.268981,
+        "优化价值_元": 11016.1306
+      }
+    },
+    "Q2": {
+      "schema_version": 1,
+      "question_id": "Q2",
+      "frozen_at": "2026-09-10T20:56:10.808043",
+      "method": "M2-full-year-LP",
+      "seed": 2026,
+      "period": "2025-02-01 ~ 2025-12-31",
+      "objective": {
+        "name": "报告期总购电费(元)",
+        "unit": "元",
+        "value": 12227243.64
+      },
+      "key_quantities": {
+        "full_year_cost_yuan": 13751266.38,
+        "emergency_cost_yuan": 0.0
+      },
+      "baselines": [
+        {
+          "id": "B2",
+          "name": "无储能",
+          "objective_value": 16407319.63
+        },
+        {
+          "id": "R2",
+          "name": "规则套利",
+          "objective_value": 14947870.26
+        }
+      ],
+      "metrics": {
+        "储能价值_元": 4180075.99,
+        "储能价值_占比": 0.254769,
+        "优化价值_元": 2720626.61
+      }
+    },
+    "Q3": {
+      "schema_version": 1,
+      "question_id": "Q3",
+      "frozen_at": "2026-09-10T20:56:10.809019",
+      "method": "M3-MPC",
+      "seed": 2026,
+      "period": "2025-02-01 ~ 2025-12-31",
+      "objective": {
+        "name": "报告期总购电费(元, 含违约/溢价/紧急)",
+        "unit": "元",
+        "value": 16972663.03
+      },
+      "cost_breakdown": {
+        "plan_cost_yuan": 12267607.43,
+        "penalty_cost_yuan": 533502.66,
+        "emergency_cost_yuan": 4171552.94
+      },
+      "baselines": [
+        {
+          "id": "B3",
+          "name": "静态不调整",
+          "objective_value": 17400028.28
+        },
+        {
+          "id": "R3",
+          "name": "规则套利",
+          "objective_value": 18065256.61
+        }
+      ],
+      "metrics": {
+        "调整价值_元": 427365.25,
+        "优化价值_元": 1092593.58
+      }
+    },
+    "Q4": {
+      "schema_version": 1,
+      "question_id": "Q4",
+      "frozen_at": "2026-09-10T20:56:10.809878",
+      "method": "M4-fluctuating-price-LP/MPC",
+      "seed": 2026,
+      "period": "2025-02-01 ~ 2025-12-31",
+      "result4_2": {
+        "name": "报告期总购电费(元, 完美预见+波动电价)",
+        "unit": "元",
+        "value": 12780453.36
+      },
+      "result4_3": {
+        "name": "报告期总购电费(元, MPC+波动电价)",
+        "unit": "元",
+        "value": 17713755.05
+      },
+      "baselines": [
+        {
+          "id": "B4",
+          "name": "无储能(波动电价)",
+          "objective_value": 17026782.86
+        },
+        {
+          "id": "R4",
+          "name": "规则套利(波动电价)",
+          "objective_value": 15787532.26
+        }
+      ],
+      "metrics": {}
+    }
+  }
+}

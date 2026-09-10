@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "frozen_at": "2026-09-10T20:56:10.809878",
+  "method": "M4-fluctuating-price-LP/MPC",
+  "seed": 2026,
+  "period": "2025-02-01 ~ 2025-12-31",
+  "result4_2": {
+    "name": "报告期总购电费(元, 完美预见+波动电价)",
+    "unit": "元",
+    "value": 12780453.36
+  },
+  "result4_3": {
+    "name": "报告期总购电费(元, MPC+波动电价)",
+    "unit": "元",
+    "value": 17713755.05
+  },
+  "baselines": [
+    {
+      "id": "B4",
+      "name": "无储能(波动电价)",
+      "objective_value": 17026782.86
+    },
+    {
+      "id": "R4",
+      "name": "规则套利(波动电价)",
+      "objective_value": 15787532.26
+    }
+  ],
+  "metrics": {}
+}

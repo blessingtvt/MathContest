@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "question_id": "Q2",
+  "reviewer": "python-code-reviewer",
+  "language": "python",
+  "files_reviewed": ["code/common.py", "code/Q2/q2_main.py", "code/Q2/q2_baseline.py"],
+  "created_at": "2026-09-10",
+  "verdict": "pass",
+  "checks": [
+    {
+      "id": "syntax",
+      "name": "语法/可执行性",
+      "status": "pass",
+      "evidence": "q2_main.py 与 q2_baseline.py 均运行成功，稀疏 LP（N=52560，变量 210241）由 HiGHS 求解成功。"
+    },
+    {
+      "id": "semantics",
+      "name": "代码语义",
+      "status": "pass",
+      "evidence": "full_year_lp 索引 ix/ic/iq/iE 与变量块一致；稀疏矩阵行对应能量平衡、充放电功率、储能动态与 E0；cobj 仅施加于购电 x。"
+    },
+    {
+      "id": "logic",
+      "name": "逻辑正确性",
+      "status": "pass",
+      "evidence": "全年联合 LP 允许储能跨日连续（区别于逐日滚动），消除日末短视。数值核验：能量缺口 min=-0.000000；E∈[1200,10800]；同区间 c·q>0 数量=0；相邻区间 E 最大跳变 925.93=PmaxE/ηd（正常满放电率，非跨日断点）。"
+    },
+    {
+      "id": "boundary",
+      "name": "边界/极限",
+      "status": "pass",
+      "evidence": "储能边界全年逐区间满足；报告期切片 X[31:]（334 天）与 Er=E[31*T:]（长度 334*T+1）边界一致；price_tile(334×144) 与 Xr 同形无广播错误。"
+    },
+    {
+      "id": "input_contract",
+      "name": "输入契约",
+      "status": "pass",
+      "evidence": "仅读取 data_clean/cleaned_data.pkl（附件1.price、附件2_load、附件2_pv），未修改 data_raw；price_flat=np.tile(price,D) 复制恒定电价。"
+    },
+    {
+      "id": "output_contract",
+      "name": "输出契约",
+      "status": "pass",
+      "evidence": "result2.xlsx 含「计划购电量」「充放电量」「紧急购电量」三 sheet；计划购电量 335×147；充放电量 334 天×6 段；紧急购电量占位「无」/0（完美预见 z=0）。run_summary.json、baseline_metrics.json 落盘。"
+    },
+    {
+      "id": "method_alignment",
+      "name": "方法对齐",
+      "status": "pass",
+      "evidence": "M2=全年联合 LP（G2 批准方案）；B2=no_storage、R2=rule_arbitrage（储能跨日结转）为可比基线。"
+    },
+    {
+      "id": "reproducibility",
+      "name": "可复现性",
+      "status": "pass",
+      "evidence": "SEED=2026；确定性 LP；scipy sparse + HiGHS 稳定。"
+    }
+  ],
+  "numeric_verification": {
+    "objective_value_report": 12227243.64,
+    "full_year_cost": 13751266.38,
+    "baseline_B2": 16407319.63,
+    "baseline_R2": 14947870.26,
+    "energy_balance_min": -0.000000,
+    "E_range": [1200.0, 10800.0],
+    "simultaneous_cq_count": 0,
+    "max_E_jump_per_interval": 925.93
+  },
+  "issues": [],
+  "notes": [
+    "full_year_cost=13751266.38 为全年 1.1-12.31 总购电费，报告期 12227243.64 元为冻结口径（2.1-12.31）。",
+    "紧急购电在完美预见下恒为 0，紧急购电量 sheet 保留占位行以满足模板结构。"
+  ]
+}
