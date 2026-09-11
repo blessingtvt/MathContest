@@ -35,10 +35,10 @@ def main():
     ws2 = wb["充放电量"]
     for s in range(6):
         lo, hi = s * 24, (s + 1) * 24
-        ws2.cell(row=2 + s, column=3, value=float(c[lo:hi].sum()))  # 充电量
-        ws2.cell(row=2 + s, column=4, value=float(q[lo:hi].sum()))  # 放电量
-    ws2.cell(row=2, column=6, value=float(E[0]))    # 0:00 储电量
-    ws2.cell(row=3, column=6, value=float(E[-1]))   # 24:00 储电量
+        ws2.cell(row=2 + s, column=2, value=float(c[lo:hi].sum()))  # 充电量
+        ws2.cell(row=2 + s, column=3, value=float(q[lo:hi].sum()))  # 放电量
+    ws2.cell(row=2, column=5, value=float(E[0]))    # 0:00 储电量
+    ws2.cell(row=3, column=5, value=float(E[-1]))   # 24:00 储电量
     wb.save(out_path)
 
     # ---- run_summary.json ----

@@ -5,12 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c3205259-df34-4b4b-bb26-7142e951bb0d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/make_figures.py" beforeDir="false" afterPath="$PROJECT_DIR$/make_figures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/figures/comparison/fig_baseline_compare.png" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/figures/comparison/fig_baseline_compare.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/figures/paper/fig1_power_balance.png" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/figures/paper/fig1_power_balance.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/figures/paper/fig3_price_purchase.png" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/figures/paper/fig3_price_purchase.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Q1/q1_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Q1/q1_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Q2/q2_baseline.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Q2/q2_baseline.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Q2/q2_code_plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Q2/q2_code_plan.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Q2/q2_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Q2/q2_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Q2/reviews/q2_python_review.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Q2/reviews/q2_python_review.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../methods/Q2/q2_decisions.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/../../methods/Q2/q2_decisions.jsonl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../methods/Q2/q2_final_method_explanation.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../methods/Q2/q2_final_method_explanation.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../planning/manifests/Q2.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../planning/manifests/Q2.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../planning/model_assumptions.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../planning/model_assumptions.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../planning/symbol_table.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../planning/symbol_table.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../results/Q1/experiments/round1/run_summary.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q1/experiments/round1/run_summary.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../results/Q1/result1.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q1/result1.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../results/Q2/reports/frozen_numbers.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q2/reports/frozen_numbers.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../results/Q2/result2.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q2/result2.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../results/Q2/~$result2.xlsx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,20 +38,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.make_figures.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.make_figures.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -63,6 +73,7 @@
       <workItem from="1789036973405" duration="109000" />
       <workItem from="1789037611819" duration="4482000" />
       <workItem from="1789055076783" duration="1910000" />
+      <workItem from="1789116692533" duration="560000" />
     </task>
     <servers />
   </component>

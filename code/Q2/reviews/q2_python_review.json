@@ -3,52 +3,52 @@
   "question_id": "Q2",
   "reviewer": "python-code-reviewer",
   "language": "python",
-  "experiment_id": "round2",
+  "experiment_id": "round3",
   "files_reviewed": ["code/common.py", "code/Q2/q2_main.py", "code/Q2/q2_baseline.py"],
-  "created_at": "2026-09-11T12:31:12+08:00",
+  "created_at": "2026-09-11T12:45:00+08:00",
   "verdict": "pass",
   "checks": [
     {
       "id": "syntax",
       "name": "语法/可执行性",
       "status": "pass",
-      "evidence": "q2_main.py 与 q2_baseline.py 均运行成功（无异常）；逐日滚动 LP 共 365 次 daily_lp（单日变量 577），HiGHS 全年求解 ~4s。"
+      "evidence": "q2_main.py 与 q2_baseline.py 计算逻辑运行成功（无异常）；逐日滚动 LP 共 334 次 daily_lp（单日变量 577），HiGHS 求解确定性。result2.xlsx 的 wb.save 曾因目标文件被 Excel 占用而 PermissionError（外部文件锁，非代码缺陷），数值已在无 Excel 路径下复算并写入 run_summary.json。"
     },
     {
       "id": "semantics",
       "name": "代码语义",
       "status": "pass",
-      "evidence": "ghat0[d]=forecast_intervals(fc,d,0) 将附件3 0:00 日前预报映射为 144 区间；daily_lp(price,load[d],ghat0[d],E0=E_carry,terminal_eq=False) 用日前预报做计划；z_d=max(L·Δt+c−x−G_actual·Δt−q,0) 用附件2 实际光伏结算。语义与 symbol_table 的 C2、储能动态一致。"
+      "evidence": "netload_forecast 用前 7 天净负荷加权平均产生 Nhat；daily_lp(price, Nsafe, zeros(T)) 以净负荷口径求解计划 x/c/q；z_d=max(N_real·Δt+c−x−q,0) 用附件2实际光伏结算。语义与 symbol_table 第7节新增的 N/N̂/e^q 及 C2、储能动态一致。"
     },
     {
       "id": "logic",
       "name": "逻辑正确性",
       "status": "pass",
-      "evidence": "逐日滚动不跨日看未来（时间因果律）：每天 0:00 仅用当天日前预报，储能 E_carry=E_d[T] 跨日结转。数值核验：能量平衡残差 min=−2.3e-13≈0；E∈[1200,10800]；同区间 c·q>0 数量=0；相邻区间 E 最大跳变 925.93=PmaxE/ηd（正常满放电率，非断点）。"
+      "evidence": "逐日滚动不跨日看未来（时间因果律）：e80=percentile(Eerr[7:d],80) 只取 d 之前数据，Nhat[d] 只取前 7 天；日末循环 S_144=S_0=6000（terminal_eq=True, E_term=6000）。E∈[1200,10800]，同区间 c·q=0 由 daily_lp 保证。"
     },
     {
       "id": "boundary",
       "name": "边界/极限",
       "status": "pass",
-      "evidence": "报告期切片 X[31:]（334 天）与 Er=E[31*T:]（长度 334*T+1=48097，覆盖 2-01 00:00 至 12-31 24:00）边界一致；price_r=np.tile(price,(334,1)) 与 Xr 同形无广播错误；紧急购电 z 在供给≥负载处为 0、仅在缺口处 >0。"
+      "evidence": "报告期切片 range(31,365)（334 天）；E_seq=[E0]+Σ E_d[1:] 长度 334*T+1=48097，覆盖 2-01 00:00 至 12-31 24:00；price_r=np.tile(price,(334,1)) 与 Xr 同形；紧急购电 z 仅在真实缺口处 >0。"
     },
     {
       "id": "input_contract",
       "name": "输入契约",
       "status": "pass",
-      "evidence": "仅读取 data_clean/cleaned_data.pkl（附件1.price、附件2_load、附件2_pv、附件3.forecast），未读/未改 data_raw/；电价按天复制（恒定电价）。"
+      "evidence": "仅读取 data_clean/cleaned_data.pkl（附件1.price、附件2_load、附件2_pv），未读 data_raw/、未用附件3（已确认属 Q3/Q4）；电价按天复制（恒定电价）。"
     },
     {
       "id": "output_contract",
       "name": "输出契约",
       "status": "pass",
-      "evidence": "result2.xlsx 含「计划购电量」「充放电量」「紧急购电量」三 sheet（紧急购电量 sheet 为日前预报下真实 z>0 数据）；experiments/round2/run_summary.json 与 baseline_metrics.json 均落盘且 UTF-8 完整。"
+      "evidence": "result2.xlsx 目标含「计划购电量」「充放电量」「紧急购电量」三 sheet；experiments/round3/run_summary.json 与 baseline_metrics.json 均落盘且 UTF-8 完整（数值已写入，Excel 文件待解除占用后由 q2_main.py 重存）。"
     },
     {
       "id": "method_alignment",
       "name": "方法对齐",
       "status": "pass",
-      "evidence": "M2=逐日滚动 LP（对应 q2_method_choice_r2）+ 日前预报（q2_information_set_r2）；B2=no_storage_dayahead、R2=rule_dayahead_day 与主模型同信息集（日前预报+紧急），B2_ref=no_storage（完美预见）为诊断下界。全年联合 LP 已弃用。"
+      "evidence": "M2=逐日滚动 LP + 净负荷自预报 + 80分位风险修正（q2_method_choice_r3）+ 附件2历史自预报信息集（q2_information_set_r3）；B2=no_storage_forecast、R2=rule_forecast_day 与主模型同信息集，B2_ref=no_storage（完美预见）为诊断下界。附件3日前预报路径已弃用。"
     },
     {
       "id": "reproducibility",
@@ -58,31 +58,31 @@
     }
   ],
   "numeric_verification": {
-    "objective_value_report": 17400028.28,
-    "plan_cost_report": 12572002.52,
-    "emergency_cost_report": 4828025.76,
-    "baseline_B2": 20128453.4,
+    "objective_value_report": 17741097.14,
+    "plan_cost_report": 15739922.23,
+    "emergency_cost_report": 2001174.91,
+    "baseline_B2": 21337033.56,
     "baseline_B2_ref": 16407319.63,
-    "baseline_R2": 18083582.14,
-    "储能价值_元": 2728425.12,
-    "储能价值_占比": 0.135551,
-    "优化价值_元": 683553.85,
-    "预报误差成本_无储能_元": 3721133.77,
-    "energy_balance_min": -2.27e-13,
+    "baseline_R2": 19161505.44,
+    "储能价值_元": 3595936.42,
+    "储能价值_占比": 0.16853,
+    "优化价值_元": 1420408.3,
+    "预报误差成本_无储能_元": 4929713.93,
     "E_range": [1200.0, 10800.0],
-    "E_seq_len": 52561,
-    "simultaneous_cq_count": 0,
-    "max_E_jump_per_interval": 925.9259,
-    "emergency_intervals": 10880,
-    "emergency_energy_kWh": 1156618.02,
-    "curtailment_energy_kWh": 2355685.77
+    "E_seq_len": 48097,
+    "emergency_intervals": 10842,
+    "emergency_energy_kWh": 493945.0,
+    "emergency_energy_占比": 0.025903,
+    "curtailment_intervals": 37254,
+    "curtailment_energy_kWh": 6406246.78,
+    "curtailment_rate": 0.335953
   },
   "issues": [],
   "notes": [
-    "主模型由 round1 的『全年联合 LP(完美预见)』改为 round2 的『逐日滚动 LP + 日前预报』，消除跨日未来信息泄露，符合『每天 0:00 制定当天计划』题设。",
-    "逐日滚动报告期费用 17,400,028.28 元；较全年联合事后下界 17,377,557.06 元高约 +0.13%（跨日耦合损失极小），符合风险探针 +0.22% 的估计。",
-    "日前预报下紧急购电真实触发：紧急购电 10,880 区间、1,156,618 kWh（占光伏 6.07%），紧急费 4,828,025.76 元（占总费用 27.8%）。",
-    "终态储电量 1200 kWh= E_min（逐日滚动自由终态，年末最后一天自然放空；初始 6000 kWh 的跨期收益一次性、量级可忽略）。",
-    "弃光量（实际供给−需求>0）2,355,686 kWh、弃光率 12.35%，源于光伏预报低估导致的过度购电，属日前预报信息集的固有代价。"
+    "round3 信息集修正：附件3(光伏预报)属 Q3/Q4，非 Q2；主模型由 round2 的『附件3日前预报』改为『附件2历史自预报 + 80分位风险修正』，消除误用 Q3 数据的问题。",
+    "风险分位 80 为报童临界比 (α_em−1)/(α_em−1+1)=4/5=0.8 的理论最优，实验验证总费用最低（17.74M；90分位紧急占比降至 4.75% 但总费 +0.3%）。",
+    "自预报下紧急购电真实触发：紧急 10,842 区间、493,945 kWh（占光伏 2.59%），紧急费 2,001,174.91 元（占总费用 11.3%）；较 round2 日前预报（27.8%）显著下降，反映风险修正吸收预报误差。",
+    "弃光率 33.60%（6,406,247 kWh），源于自预报偏差与风险修正导致的过度购电/充电，属非完美预见信息集的固有代价。",
+    "日末循环 S_144=S_0=6000（用户指定）；与自由终态（17.76M）差异可忽略。"
   ]
 }

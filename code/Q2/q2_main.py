@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Q2 主模型 (M2: 逐日滚动 LP + 日前预报 + 紧急购电, 非完美预见 HD3)。
+"""Q2 主模型 (M2: 逐日滚动 LP + 净负荷自预报 + 80分位风险修正)。
 
-每天 0:00 用附件3 0:00 日前光伏预报制定当日计划 (x, c, q), 负载用附件2 实际值(已知);
-储能跨日连续(逐日滚动, 每天只解当天, 不跨日看未来——时间因果律)。
-实际光伏(附件2)与预报的偏差由紧急购电 z(5倍价)吸收。
-计划购电费按计划量结算, 紧急购电费按 5 倍价结算:
-  cost = Σ p_t·x_t + 5·Σ p_t·z_t,  z_t = max(L_t·Δt + c_t − x_t − G_t^实际·Δt − q_t, 0)
+信息集(修正 2026-09-11): 附件3(光伏预报) 属于 Q3/Q4, Q2 只能用 附件1电价 + 附件2历史。
+每天 0:00 决策流程:
+  1. 净负荷 N_d = L_d - P_d; 7 天加权平均自预报 N̂_d = Σ w_k N_{d-k};
+  2. 历史误差 80 分位 e^80 (仅用 d 之前数据, 因果), 安全净负荷 N^safe = N̂ + e^80;
+  3. 单日 LP(净负荷口径) 求当日计划购电 G、充/放电 C/D, 日末循环 S_144 = S_0 = 6000;
+  4. 用当日真实净负荷结算, 缺口紧急购电 z(5 倍价)。
 
-报告期 2025-02-01 ~ 2025-12-31; 1 月预热(HD5)。
-输出: results/Q2/result2.xlsx + experiments/round2/run_summary.json
+费用: C2 = Σ p_t·G_t + 5·Σ p_t·z_t。报告期 2025-02-01 ~ 12-31。
 """
 import os, sys, json
 from datetime import datetime
@@ -18,15 +18,33 @@ import numpy as np
 import openpyxl
 from common import *
 
+W = [0.3, 0.2, 0.15, 0.12, 0.1, 0.08, 0.05]
+QUANTILE = 80.0
 
-def rule_dayahead_day(price, load_d, pv_actual, forecast, d, E_carry):
-    """R2 基线: 规则套利 + 0:00 日前预报(与 M2 同信息), 预报误差由紧急购电吸收。
 
-    返回 (cost, x, c, q, E_end, z)。
-    """
-    ghat0 = forecast_intervals(forecast, d, 0)
-    _, x, c, q, Est = rule_arbitrage(price, load_d, ghat0, E0=E_carry)
-    z = clip0(np.maximum(load_d * DT + c - x - pv_actual * DT - q, 0.0))
+def netload_forecast(N):
+    """7 天加权平均净负荷预报 (仅用历史, 因果)。返回 (Nhat, Eerr)。"""
+    D = N.shape[0]
+    w = np.array(W)
+    Nhat = np.zeros_like(N)
+    for d in range(len(w), D):
+        for k in range(len(w)):
+            Nhat[d] += w[k] * N[d - 1 - k]
+    return Nhat, N - Nhat
+
+
+def no_storage_forecast(price, Nsafe, Nreal):
+    """B2 基线: 无储能 + 自预报(含风险修正), 缺口紧急购电。返回 (cost, x, z)。"""
+    x = np.maximum(Nsafe * DT, 0.0)
+    z = np.maximum(Nreal * DT - x, 0.0)
+    cost = float((price * x).sum() + ALPHA_EM * (price * z).sum())
+    return cost, x, z
+
+
+def rule_forecast_day(price, Nsafe, Nreal, E_carry):
+    """R2 基线: 规则套利(价格阈值) + 自预报, 缺口紧急购电。返回 (cost, x, c, q, E_end, z)。"""
+    _, x, c, q, Est = rule_arbitrage(price, Nsafe, np.zeros(T), E0=E_carry)
+    z = clip0(np.maximum(Nreal * DT + c - x - q, 0.0))
     cost = float((price * x).sum() + ALPHA_EM * (price * z).sum())
     return cost, x, c, q, Est[-1], z
 
@@ -34,71 +52,58 @@ def rule_dayahead_day(price, load_d, pv_actual, forecast, d, E_carry):
 def main():
     b = load_bundle()
     price = b["附件1"]["price"]
-    load = b["附件2_load"]        # (365,144) 实际负载 (确定性已知)
-    pv = b["附件2_pv"]            # (365,144) 实际光伏 (结算用)
-    fc = b["附件3"]["forecast"]   # (1460,24) 滚动光伏预报
+    load = b["附件2_load"]
+    pv = b["附件2_pv"]
     D = load.shape[0]
     dates = report_dates(b)
     labels = time_labels()
+    N = load - pv                       # 净负荷 (kW)
+    Nhat, Eerr = netload_forecast(N)
 
-    # ---- 0:00 日前光伏预报 (每天取 forecast 0:00 时刻) ----
-    ghat0 = np.zeros((D, T))
-    for d in range(D):
-        ghat0[d] = forecast_intervals(fc, d, 0)
-
-    # ---- 主模型 M2: 逐日滚动 LP (每天 0:00 仅用当天日前预报, 储能跨日结转) ----
-    X = np.zeros((D, T)); C = np.zeros((D, T)); Q = np.zeros((D, T)); Z = np.zeros((D, T))
-    E_carry = E0_INIT
+    # ---- 主模型 M2: 逐日滚动 LP + 80 分位风险修正 (日末循环 S_144=S_0) ----
+    R = REPORT_DAYS
+    Xr = np.zeros((R, T)); Cr = np.zeros((R, T)); Qr = np.zeros((R, T)); Zr = np.zeros((R, T))
     E_seq = [E0_INIT]
-    for d in range(D):
-        _, x_d, c_d, q_d, E_d = daily_lp(price, load[d], ghat0[d], E0=E_carry, terminal_eq=False)
-        z_d = clip0(np.maximum(load[d] * DT + c_d - x_d - pv[d] * DT - q_d, 0.0))
-        X[d] = x_d; C[d] = c_d; Q[d] = q_d; Z[d] = z_d
-        E_carry = E_d[T]
+    for i, d in enumerate(range(WARMUP_DAYS, D)):
+        e80 = np.percentile(Eerr[7:d], QUANTILE, axis=0) if d > 7 else np.zeros(T)
+        Nsafe = Nhat[d] + e80
+        _, x_d, c_d, q_d, E_d = daily_lp(price, Nsafe, np.zeros(T), E0=E0_INIT,
+                                         terminal_eq=True, E_term=E0_INIT)
+        z_d = clip0(np.maximum(N[d] * DT + c_d - x_d - q_d, 0.0))
+        Xr[i] = x_d; Cr[i] = c_d; Qr[i] = q_d; Zr[i] = z_d
         E_seq.extend(E_d[1:].tolist())
-    E = np.array(E_seq)  # 长度 D*T+1
+    Er = np.array(E_seq)                # 长度 R*T+1
 
-    # ---- 报告期切片 (索引 31..364) ----
-    Xr, Cr, Qr, Zr = X[WARMUP_DAYS:], C[WARMUP_DAYS:], Q[WARMUP_DAYS:], Z[WARMUP_DAYS:]
-    Er = E[WARMUP_DAYS * T:]
-    price_r = np.tile(price, (REPORT_DAYS, 1))
+    price_r = np.tile(price, (R, 1))
     plan_cost = float((price_r * Xr).sum())
     emergency_cost = float(ALPHA_EM * (price_r * Zr).sum())
     report_cost = plan_cost + emergency_cost
 
-    # ---- 基线 ----
-    # B2 无储能 + 日前预报 + 紧急 (与 M2 同信息, 公平对比)
-    b_cost = 0.0
-    for d in range(WARMUP_DAYS, D):
-        b_cost += no_storage_dayahead(price, load[d], pv[d], fc, d)[0]
-    # B2_ref 无储能 + 完美预见 (诊断参考下界, 无预报误差)
-    b_ref_cost = 0.0
-    for d in range(WARMUP_DAYS, D):
-        b_ref_cost += no_storage(price, load[d], pv[d])[0]
-    # R2 规则套利 + 日前预报 (与 M2 同信息)
-    r_cost = 0.0
+    # ---- 基线 (同信息集: 自预报 + 80 分位风险修正) ----
+    b_cost = b_ref_cost = r_cost = 0.0
     Erule = E0_INIT
-    for d in range(D):
-        cost_d, _, _, _, E_end, _ = rule_dayahead_day(price, load[d], pv[d], fc, d, Erule)
+    for d in range(WARMUP_DAYS, D):
+        e80 = np.percentile(Eerr[7:d], QUANTILE, axis=0) if d > 7 else np.zeros(T)
+        Nsafe = Nhat[d] + e80
+        b_cost += no_storage_forecast(price, Nsafe, N[d])[0]
+        b_ref_cost += no_storage(price, load[d], pv[d])[0]
+        rc, _, _, _, E_end, _ = rule_forecast_day(price, Nsafe, N[d], Erule)
+        r_cost += rc
         Erule = E_end
-        if d >= WARMUP_DAYS:
-            r_cost += cost_d
 
-    # ---- 校验指标 ----
+    # ---- 指标 ----
     emg_int = int((Zr > 1e-8).sum())
     emg_energy = float(Zr.sum())
-    # 实际弃光: 实际供给 - 实际需求 > 0 (光伏富余, 非购电)
     supply = Xr + pv[WARMUP_DAYS:] * DT + Qr
     demand = load[WARMUP_DAYS:] * DT + Cr
     curt = clip0(supply - demand)
     curt_int = int((curt > 1e-8).sum())
     curt_energy = float(curt.sum())
     pv_report = float(pv[WARMUP_DAYS:].sum() * DT)
-    E_all = np.asarray(E)
 
     # ---- 写 result2.xlsx ----
     out_dir = os.path.join(RESULTS_DIR, "Q2")
-    os.makedirs(os.path.join(out_dir, "experiments", "round2"), exist_ok=True)
+    os.makedirs(os.path.join(out_dir, "experiments", "round3"), exist_ok=True)
     out_path = os.path.join(out_dir, "result2.xlsx")
     wb = openpyxl.load_workbook(os.path.join(TEMPLATE_DIR, "result2.xlsx"))
     fill_plan_grid(wb["计划购电量"], Xr)
@@ -110,16 +115,17 @@ def main():
     summary = {
         "schema_version": 1,
         "question_id": "Q2",
-        "experiment_id": "round2",
-        "method": "M2-daily-rolling-LP+emergency",
+        "experiment_id": "round3",
+        "method": "M2-daily-rolling-LP+netload-self-forecast+risk-correction(q80)",
         "seed": SEED,
         "status": "success",
         "created_at": datetime.now().isoformat(),
         "data_sources": ["data_clean/cleaned_data.pkl"],
         "report_period": "2025-02-01 ~ 2025-12-31",
-        "warmup": "2025-01-01 ~ 2025-01-31 (31天, HD5)",
-        "forecast": "附件3 0:00 日前预报 (非完美预见), 负载用附件2实际值",
-        "approved_decision_id": "q2_method_choice_r2",
+        "warmup": "附件2历史(7天加权平均预报 + 历史误差分位, 仅用当日之前数据)",
+        "forecast": "净负荷 N=L-P, 7天加权平均 w=[0.3,0.2,0.15,0.12,0.1,0.08,0.05]; 历史误差 80 分位风险修正",
+        "information_set_note": "附件3(光伏预报)属 Q3/Q4, 非 Q2; Q2 用附件2历史自预报",
+        "approved_decision_id": "q2_method_choice_r3",
         "main": {
             "method_id": "M2",
             "objective_name": "报告期总购电费(元, 含计划+紧急)",
@@ -129,9 +135,9 @@ def main():
             "outputs": ["results/Q2/result2.xlsx"],
         },
         "baselines": [
-            {"id": "B2", "name": "无储能(日前预报+紧急)", "objective_value": round(b_cost, 2)},
+            {"id": "B2", "name": "无储能(自预报+80分位)", "objective_value": round(b_cost, 2)},
             {"id": "B2_ref", "name": "无储能(完美预见, 下界)", "objective_value": round(b_ref_cost, 2)},
-            {"id": "R2", "name": "规则套利(日前预报)", "objective_value": round(r_cost, 2)},
+            {"id": "R2", "name": "规则套利(自预报+80分位)", "objective_value": round(r_cost, 2)},
         ],
         "metrics": {
             "储能价值_元": round(b_cost - report_cost, 2),
@@ -144,12 +150,11 @@ def main():
             "弃光_区间数": curt_int,
             "弃光_电量kWh": round(curt_energy, 2),
             "弃光率": round(curt_energy / pv_report, 6),
-            "储电量_min": round(float(E_all.min()), 2),
-            "储电量_max": round(float(E_all.max()), 2),
-            "终态储电量": round(float(E_all[-1]), 2),
+            "储电量_min": round(float(Er.min()), 2),
+            "储电量_max": round(float(Er.max()), 2),
         },
     }
-    with open(os.path.join(out_dir, "experiments", "round2", "run_summary.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(out_dir, "experiments", "round3", "run_summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
 
     print(json.dumps(summary, ensure_ascii=False, indent=2))
