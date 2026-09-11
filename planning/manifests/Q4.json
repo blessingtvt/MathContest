@@ -3,7 +3,7 @@
   "question_id": "Q4",
   "rigor_profile": "lean",
   "current_gate": "G4",
-  "status": "results_frozen_waiting_human",
+  "status": "results_judged_and_frozen",
   "artifacts": {
     "parse": "planning/parse/problem_parse.json",
     "classification": "planning/classification/problem_classification.json",
@@ -16,12 +16,12 @@
     "code_plan": "code/Q4/q4_code_plan.md",
     "code_review": "code/Q4/reviews/q4_python_review.json",
     "final_method_explanation": "methods/Q4/q4_final_method_explanation.md",
-    "latest_run": "results/Q4/experiments/round1/run_summary.json",
+    "latest_run": "results/Q4/experiments/round2/run_summary.json",
     "frozen_numbers": "results/Q4/reports/frozen_numbers.json"
   },
-  "allowed": { "code_generation": true, "freeze": true, "paper_writing": false, "final_assembly": false },
+  "allowed": { "code_generation": true, "freeze": true, "paper_writing": true, "final_assembly": false },
   "blockers": [],
-  "assumption_notes": "继承 HD3/HD4；波动电价口径已核（附件4均值≈附件1）",
-  "next_action": { "owner": "human", "skill": "workflow-orchestrator", "reason": "G4 冻结完成，待人类确认后进入 G5-G6 论文写作与三重审计" },
-  "updated_at": "2026-09-10T21:00:00+08:00"
+  "assumption_notes": "G4 完成：round2 结果判定+稳健性+冻结。result4_2=15231785.59，result4_3=15759231.74；诊断 A=12830486.39(储能完美日闭合)、B=12780883.29(储能完美自由结转)。预报误差成本储能侧 2401299.20 > 无储能侧 1847271.34（储能对预报更敏感，收益上限≈240万）。恒定vs波动：总成本+4.6%、套利空间+2.0%、预报误差损失+3.8%。q=80 近最优(4-2偏离0.69%, 4-3恰最优)。frozen_numbers.json 已生成(package_signoff=keep)。待人类确认进入 G5-G6 论文写作与三重审计。",
+  "next_action": { "owner": "human", "skill": "workflow-orchestrator", "reason": "G4 结果稳健性与数值冻结完成（package_signoff 已记录），待人类确认进入 G5 论文写作与 G6 三重审计" },
+  "updated_at": "2026-09-12T02:45:00+08:00"
 }

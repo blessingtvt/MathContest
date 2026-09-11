@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "experiment_id": "round2",
+  "implementation_target": "python",
+  "method": "M4-inherit-Q2/Q3-final+fluctuating-price",
+  "seed": 2026,
+  "approved_decision_id": "q4_method_choice_r2",
+  "status": "success",
+  "created_at": "2026-09-12T02:21:45.772911",
+  "data_sources": [
+    "data_clean/cleaned_data.pkl"
+  ],
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "result4_2": {
+    "objective_name": "报告期总购电费(元, Q2模型+波动电价)",
+    "objective_value": 15231785.59,
+    "plan_cost": 13600021.28,
+    "emergency_cost": 1631764.31,
+    "outputs": [
+      "results/Q4/result4-2.xlsx"
+    ]
+  },
+  "result4_3": {
+    "objective_name": "报告期总购电费(元, Q3模型+波动电价)",
+    "objective_value": 15759231.74,
+    "plan_cost": 12929399.19,
+    "penalty_cost": 1909943.19,
+    "emergency_cost": 919889.36,
+    "outputs": [
+      "results/Q4/result4-3.xlsx"
+    ]
+  },
+  "baselines": [
+    {
+      "id": "B4",
+      "name": "无储能(自预报+星期80分位,波动电价)",
+      "objective_value": 18874054.2
+    },
+    {
+      "id": "R4",
+      "name": "规则套利(自预报+星期80分位,波动电价)",
+      "objective_value": 17425496.32
+    },
+    {
+      "id": "B4_ref",
+      "name": "无储能完美预见下界(诊断基准,非可执行策略)",
+      "objective_value": 17026782.86
+    }
+  ],
+  "diagnostics": [
+    {
+      "id": "A",
+      "name": "储能完美预见(日闭合,与result4-2同约束)",
+      "objective_value": 12830486.39
+    },
+    {
+      "id": "B",
+      "name": "储能完美预见(自由结转,全局最优理论下界)",
+      "objective_value": 12780883.29
+    }
+  ],
+  "metrics": {
+    "result4_2": {
+      "储能价值_元": 3642268.6,
+      "优化价值_元": 2193710.73,
+      "预报误差成本_无储能侧_元": 1847271.34,
+      "预报误差成本_储能侧_元": 2401299.2,
+      "日闭合约束成本_元": 49603.1,
+      "完美预见总价值_储能侧_元": 2450902.3,
+      "紧急购电_电量kWh": 396996.49,
+      "弃光_电量kWh": 2555005.21,
+      "弃光率": 0.133988,
+      "储电量_min": 1200.0,
+      "储电量_max": 10800.0
+    },
+    "result4_3": {
+      "紧急购电_电量kWh": 245553.35,
+      "弃光_电量kWh": 2821761.39,
+      "弃光率": 0.147977,
+      "储电量_E0_min": 6000.0,
+      "储电量_E0_max": 6000.0,
+      "储电量_E24_min": 6000.0,
+      "储电量_E24_max": 6000.0
+    }
+  },
+  "fallback_trigger": {
+    "fallback_id": "F4",
+    "condition": "HD3/HD4口径变化或极端电价(0.0076)导致储能解退化",
+    "observed": false,
+    "evidence": null
+  }
+}

@@ -1,31 +1,266 @@
 {
   "schema_version": 1,
   "question_id": "Q4",
-  "frozen_at": "2026-09-10T20:56:10.809878",
-  "method": "M4-fluctuating-price-LP/MPC",
+  "frozen_at": "2026-09-12T02:36:41+08:00",
+  "frozen_by_skill": "solution-package-builder",
+  "decision_id": "q4_package_signoff",
+  "signoff_status": "confirmed_keep",
+  "round": "round2",
   "seed": 2026,
-  "period": "2025-02-01 ~ 2025-12-31",
-  "result4_2": {
-    "name": "报告期总购电费(元, 完美预见+波动电价)",
-    "unit": "元",
-    "value": 12780453.36
-  },
-  "result4_3": {
-    "name": "报告期总购电费(元, MPC+波动电价)",
-    "unit": "元",
-    "value": 17713755.05
-  },
-  "baselines": [
+  "method": "M4-inherit-Q2/Q3-final+fluctuating-price",
+  "note": "波动电价(附件4)下完全继承 Q2(round4)/Q3(round3) 最终模型仅换电价。完美预见(A/B/B4_ref)为诊断基准, 非可执行策略。论文全部数值必须引用本文件, 严禁手工编辑。冻结后若规范源变更, 须走 thaw→rerun→refreeze 并记 freeze_change_log.md。",
+  "numbers": [
     {
-      "id": "B4",
-      "name": "无储能(波动电价)",
-      "objective_value": 17026782.86
+      "claim_id": "q4_result4_2_total_cost",
+      "value": 15231785.59,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.result4_2.objective_value"
     },
     {
-      "id": "R4",
-      "name": "规则套利(波动电价)",
-      "objective_value": 15787532.26
+      "claim_id": "q4_result4_2_plan_cost",
+      "value": 13600021.28,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.result4_2.plan_cost"
+    },
+    {
+      "claim_id": "q4_result4_2_emergency_cost",
+      "value": 1631764.31,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.result4_2.emergency_cost"
+    },
+    {
+      "claim_id": "q4_result4_3_total_cost",
+      "value": 15759231.74,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.result4_3.objective_value"
+    },
+    {
+      "claim_id": "q4_result4_3_plan_cost",
+      "value": 12929399.19,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.result4_3.plan_cost"
+    },
+    {
+      "claim_id": "q4_result4_3_penalty_cost",
+      "value": 1909943.19,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.result4_3.penalty_cost"
+    },
+    {
+      "claim_id": "q4_result4_3_emergency_cost",
+      "value": 919889.36,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.result4_3.emergency_cost"
+    },
+    {
+      "claim_id": "q4_baseline_B4",
+      "value": 18874054.2,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.baselines[0].objective_value"
+    },
+    {
+      "claim_id": "q4_baseline_R4",
+      "value": 17425496.32,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.baselines[1].objective_value"
+    },
+    {
+      "claim_id": "q4_baseline_B4_ref",
+      "value": 17026782.86,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.baselines[2].objective_value"
+    },
+    {
+      "claim_id": "q4_diag_A_storage_perfect_daily",
+      "value": 12830486.39,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.diagnostics[0].objective_value"
+    },
+    {
+      "claim_id": "q4_diag_B_storage_perfect_free",
+      "value": 12780883.29,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.diagnostics[1].objective_value"
+    },
+    {
+      "claim_id": "q4_storage_value",
+      "value": 3642268.6,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_2.储能价值_元"
+    },
+    {
+      "claim_id": "q4_optimization_value",
+      "value": 2193710.73,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_2.优化价值_元"
+    },
+    {
+      "claim_id": "q4_forecast_error_cost_no_storage",
+      "value": 1847271.34,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_2.预报误差成本_无储能侧_元"
+    },
+    {
+      "claim_id": "q4_forecast_error_cost_storage",
+      "value": 2401299.2,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_2.预报误差成本_储能侧_元"
+    },
+    {
+      "claim_id": "q4_day_closure_cost",
+      "value": 49603.1,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_2.日闭合约束成本_元"
+    },
+    {
+      "claim_id": "q4_perfect_foresight_total_value",
+      "value": 2450902.3,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_2.完美预见总价值_储能侧_元"
+    },
+    {
+      "claim_id": "q4_emergency_energy_42",
+      "value": 396996.49,
+      "unit": "kWh",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_2.紧急购电_电量kWh"
+    },
+    {
+      "claim_id": "q4_curtailment_rate_42",
+      "value": 0.133988,
+      "unit": "无量纲",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_2.弃光率"
+    },
+    {
+      "claim_id": "q4_emergency_energy_43",
+      "value": 245553.35,
+      "unit": "kWh",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_3.紧急购电_电量kWh"
+    },
+    {
+      "claim_id": "q4_curtailment_rate_43",
+      "value": 0.147977,
+      "unit": "无量纲",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_locator": "$.metrics.result4_3.弃光率"
+    },
+    {
+      "claim_id": "q4_quantile_argmin_42",
+      "value": 90,
+      "unit": "分位(%)",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R1_quantile_sweep.argmin_q_result4_2"
+    },
+    {
+      "claim_id": "q4_quantile_argmin_43",
+      "value": 80,
+      "unit": "分位(%)",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R1_quantile_sweep.argmin_q_result4_3"
+    },
+    {
+      "claim_id": "q4_quantile_q80_delta_42",
+      "value": 104885.75,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R1_quantile_sweep.q80_vs_argmin_result4_2_delta"
+    },
+    {
+      "claim_id": "q4_quantile_q0_42",
+      "value": 26160265.52,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R1_quantile_sweep.result4_2_total_by_q.0"
+    },
+    {
+      "claim_id": "q4_quantile_q90_42",
+      "value": 15126899.84,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R1_quantile_sweep.result4_2_total_by_q.90"
+    },
+    {
+      "claim_id": "q4_quantile_q100_42",
+      "value": 16144879.27,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R1_quantile_sweep.result4_2_total_by_q.100"
+    },
+    {
+      "claim_id": "q4_result4_2_constant",
+      "value": 14559104.58,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R3_constant_vs_fluctuating.result4_2_constant"
+    },
+    {
+      "claim_id": "q4_storage_value_constant",
+      "value": 3613022.84,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R3_constant_vs_fluctuating.storage_value_constant"
+    },
+    {
+      "claim_id": "q4_storage_value_fluctuating",
+      "value": 3642268.61,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R3_constant_vs_fluctuating.storage_value_fluctuating"
+    },
+    {
+      "claim_id": "q4_storage_arbitrage_space_constant",
+      "value": 5927080.51,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R3_constant_vs_fluctuating.storage_arbitrage_space_constant"
+    },
+    {
+      "claim_id": "q4_storage_arbitrage_space_fluctuating",
+      "value": 6043567.81,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R3_constant_vs_fluctuating.storage_arbitrage_space_fluctuating"
+    },
+    {
+      "claim_id": "q4_forecast_error_cost_storage_constant",
+      "value": 2314057.67,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R3_constant_vs_fluctuating.forecast_error_cost_storage_constant"
+    },
+    {
+      "claim_id": "q4_forecast_error_cost_storage_fluctuating",
+      "value": 2401299.2,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R3_constant_vs_fluctuating.forecast_error_cost_storage_fluctuating"
+    },
+    {
+      "claim_id": "q4_day_closure_cost_constant",
+      "value": 16880.35,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
+      "source_locator": "$.R3_constant_vs_fluctuating.day_closure_cost_constant"
     }
-  ],
-  "metrics": {}
+  ]
 }

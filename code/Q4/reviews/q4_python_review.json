@@ -1,73 +1,42 @@
 {
   "schema_version": 1,
   "question_id": "Q4",
+  "experiment_id": "round2",
   "reviewer": "python-code-reviewer",
   "language": "python",
-  "files_reviewed": ["code/common.py", "code/Q4/q4_main.py", "code/Q4/q4_baseline.py"],
-  "created_at": "2026-09-10",
-  "verdict": "pass",
+  "files_reviewed": [
+    "code/Q4/q4_main.py",
+    "code/Q4/q4_baseline.py"
+  ],
+  "created_at": "2026-09-12T02:10:00+08:00",
+  "verdict": "PASS",
   "checks": [
     {
-      "id": "syntax",
-      "name": "语法/可执行性",
-      "status": "pass",
-      "evidence": "q4_main.py 与 q4_baseline.py 均运行成功；全年联合 LP（result4-2）与逐日 MPC（result4-3）均收敛。"
+      "name": "syntax",
+      "status": "PASS",
+      "evidence": "py_compile.compile(..., doraise=True) 对两个文件均无异常；脚本端到端运行成功并产出 xlsx 与 run_summary.json。"
     },
     {
-      "id": "semantics",
-      "name": "代码语义",
-      "status": "pass",
-      "evidence": "与 Q2/Q3 共用 common.full_year_lp / q3_mpc_day，仅将 price 替换为附件4 price_d[d]；目标与约束语义不变（购电费最小、能量平衡、储能边界/动态）。"
+      "name": "input_contract",
+      "status": "PASS",
+      "evidence": "数据仅经 load_bundle() 读取 data_clean/cleaned_data.pkl（附件1/2/3/4 清洗后数据）；模板经 openpyxl.load_workbook 只读 data_raw/附件5/result4-2.xlsx 与 result4-3.xlsx；所有写入均指向 results/Q4/，不修改 data_raw 原始文件。"
     },
     {
-      "id": "logic",
-      "name": "逻辑正确性",
-      "status": "pass",
-      "evidence": "result4-2 为全年联合 LP 的波动电价版；result4-3 为滚动 MPC 的波动电价版；切报告期与拼接逻辑同 Q2/Q3，数值核验通过（见 numeric_verification）。"
+      "name": "method_alignment",
+      "status": "PASS",
+      "evidence": "result4-2 用 daily_lp（逐日滚动 + 附件2历史净负荷自预报 w=[0.3..0.05] + 按星期分桶80分位 error_quantile_dow + 日闭合 E0=E_term=6000），未调用 full_year_lp（完美预见）；result4-3 用 q3_mpc_day + issue_risk_delta(over,d,80,7)（issue80分位光伏修正 δ），仅电价 price_d[d] 替换恒定价，完全继承 Q2(round4)/Q3(round3) 最终模型。基线 B4=no_storage_forecast、R4=rule_arbitrage(自预报)、B4_ref=no_storage(完美预见) 与 method card 一致。"
     },
     {
-      "id": "boundary",
-      "name": "边界/极限",
-      "status": "pass",
-      "evidence": "报告期切片 334 天；result4-2 的 Er 长度 334*T+1；result4-3 的 E_flat 覆盖 0:00/24:00；电价口径已核：附件4 均值 0.7662 ≈ 附件1 恒定电价 0.7662（min 0.0076 / max 1.7936）。"
+      "name": "reproducibility",
+      "status": "PASS",
+      "evidence": "SEED=2026（common.SEED）；模型为确定性线性规划（scipy HiGHS），无随机量；两次独立运行（q4_main.py 与 q4_baseline.py 中基线）数值一致（B4=18874054.20、R4=17425496.32、B4_ref=17026782.86）。"
     },
     {
-      "id": "input_contract",
-      "name": "输入契约",
-      "status": "pass",
-      "evidence": "仅读取 data_clean/cleaned_data.pkl（附件4_price、附件2_load/pv、附件3.forecast），未修改 data_raw。"
-    },
-    {
-      "id": "output_contract",
-      "name": "输出契约",
-      "status": "pass",
-      "evidence": "result4-2.xlsx 为 Q2 结构（计划/充放/紧急），result4-3.xlsx 为 Q3 结构（计划/调整/充放/紧急）；均 335×147；run_summary.json 含 result4_2/result4_3 两段，baseline_metrics.json 落盘。"
-    },
-    {
-      "id": "method_alignment",
-      "name": "方法对齐",
-      "status": "pass",
-      "evidence": "M4 复用 Q2/Q3 主方法（仅换电价）；B4=no_storage、R4=rule_arbitrage（波动电价）为可比基线。"
-    },
-    {
-      "id": "reproducibility",
-      "name": "可复现性",
-      "status": "pass",
-      "evidence": "SEED=2026；确定性 LP/MPC，无随机量。"
+      "name": "output_contract",
+      "status": "PASS",
+      "evidence": "results/Q4/result4-2.xlsx（计划购电量/充放电量/紧急购电量）、result4-3.xlsx（计划购电量/调整购电量/充放电量/紧急购电量）均生成且非空；experiments/round2/run_summary.json 含 result4_2/result4_3/baselines/metrics/fallback_trigger，status=success、seed=2026；baseline_metrics.json 含 3 条基线。"
     }
   ],
-  "numeric_verification": {
-    "result4_2_objective": 12780453.36,
-    "result4_3_objective": 17713755.05,
-    "baseline_B4": 17026782.86,
-    "baseline_R4": 15787532.26,
-    "price_mean_attachment4": 0.7662,
-    "price_min_attachment4": 0.0076,
-    "price_max_attachment4": 1.7936
-  },
-  "issues": [],
-  "notes": [
-    "波动电价 min≈0.0076 使低价时段储能大量吸收低价电，导致 result4-2 与恒定电价版存在差异，符合预期。",
-    "result4-3（MPC）高于 result4-2（完美预见），反映预报误差与调整成本，方向正确。"
-  ]
+  "defects_found": [],
+  "iteration": 1
 }

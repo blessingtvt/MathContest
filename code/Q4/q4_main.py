@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Q4 主模型 (M4: 波动电价 附件4 下重解 Q2、Q3)。
+"""Q4 主模型 M4 (round2) —— 波动电价下完全继承 Q2/Q3 最终模型。
 
-result4-2.xlsx = Q2 结构(全年联合LP, 波动电价);
-result4-3.xlsx = Q3 结构(滚动MPC, 波动电价)。
-输出: results/Q4/result4-2.xlsx, result4-3.xlsx + experiments/round1/run_summary.json
+result4-2 (对应 Q2): 逐日滚动 LP + 附件2历史净负荷自预报(7天加权) + 按星期分桶80分位风险修正
+                    + 日闭合 E(144)=E(0)=6000, 电价 p_t → p_{d,t}。
+result4-3 (对应 Q3): 滚动 MPC(0:00计划+6/12/18调整) + 分段计费 + 日闭合
+                    + 按 issue 分桶80分位光伏风险修正 δ=[0,1005.49,-6.27,0], 电价 p_t → p_{d,t}。
+基线: B4 无储能(自预报+星期80分位) / R4 规则套利(自预报+星期80分位) / B4_ref 无储能完美预见(诊断下界)。
+
+输出: results/Q4/result4-2.xlsx, result4-3.xlsx + experiments/round2/run_summary.json
 """
 import os, sys, json
 from datetime import datetime
@@ -12,6 +16,54 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import openpyxl
 from common import *
+
+ROUND = "round2"
+QUANTILE = 80.0
+MIN_HIST = 7
+W = [0.3, 0.2, 0.15, 0.12, 0.1, 0.08, 0.05]
+
+
+def bundle_dow(bundle):
+    """365 天的星期索引 (0=周一..6=周日)，与 bundle['dates'] 对齐。"""
+    return np.array([datetime.strptime(s, "%Y-%m-%d %H:%M:%S").weekday()
+                     for s in bundle["dates"]])
+
+
+def error_quantile_dow(Eerr, full_dow, d, quantile=80.0):
+    """按星期分桶的历史误差 quantile 分位 (仅用 d 之前同星期数据, 因果)。"""
+    hist = Eerr[7:d]
+    hd = full_dow[7:d]
+    mask = hd == full_dow[d]
+    if mask.sum() == 0:
+        return np.zeros(Eerr.shape[1])
+    return np.percentile(hist[mask], quantile, axis=0)
+
+
+def netload_forecast(N):
+    """7 天加权平均净负荷预报 (仅用历史, 因果)。返回 (Nhat, Eerr)。"""
+    D = N.shape[0]
+    w = np.array(W)
+    Nhat = np.zeros_like(N)
+    for d in range(len(w), D):
+        for k in range(len(w)):
+            Nhat[d] += w[k] * N[d - 1 - k]
+    return Nhat, N - Nhat
+
+
+def no_storage_forecast(price, Nsafe, Nreal):
+    """B4 基线: 无储能 + 自预报(含风险修正), 缺口紧急购电。返回 (cost, x, z)。"""
+    x = np.maximum(Nsafe * DT, 0.0)
+    z = np.maximum(Nreal * DT - x, 0.0)
+    cost = float((price * x).sum() + ALPHA_EM * (price * z).sum())
+    return cost, x, z
+
+
+def rule_forecast_day(price, Nsafe, Nreal, E_carry):
+    """R4 基线: 规则套利(价格阈值) + 自预报, 缺口紧急购电。返回 (cost, x, c, q, E_end, z)。"""
+    _, x, c, q, Est = rule_arbitrage(price, Nsafe, np.zeros(T), E0=E_carry)
+    z = clip0(np.maximum(Nreal * DT + c - x - q, 0.0))
+    cost = float((price * x).sum() + ALPHA_EM * (price * z).sum())
+    return cost, x, c, q, Est[-1], z
 
 
 def main():
@@ -23,44 +75,61 @@ def main():
     D = load.shape[0]
     dates = report_dates(b)
     labels = time_labels()
+    N = load - pv                        # 净负荷 (kW)
+    Nhat, Eerr = netload_forecast(N)
+    full_dow = bundle_dow(b)
+    over = pv_overestimation(fc, pv)
 
-    # ============ result4-2: 全年联合 LP (波动电价) ============
-    full_cost, X, C, Q, E = full_year_lp(price_d.reshape(-1), load.reshape(-1), pv.reshape(-1), E0=E0_INIT)
-    Xr, Cr, Qr = X[WARMUP_DAYS:], C[WARMUP_DAYS:], Q[WARMUP_DAYS:]
-    Er = E[WARMUP_DAYS * T:]
-    report_cost_42 = float((price_d[WARMUP_DAYS:].reshape(-1) * Xr.reshape(-1)).sum())
-    Z = np.zeros((REPORT_DAYS, T))
-
+    R = REPORT_DAYS
     out_dir = os.path.join(RESULTS_DIR, "Q4")
-    os.makedirs(os.path.join(out_dir, "experiments", "round1"), exist_ok=True)
+    os.makedirs(os.path.join(out_dir, "experiments", ROUND), exist_ok=True)
+
+    # ============ result4-2: Q2 模型 + 波动电价 ============
+    Xr = np.zeros((R, T)); Cr = np.zeros((R, T)); Qr = np.zeros((R, T)); Zr = np.zeros((R, T))
+    E_seq = [E0_INIT]
+    for i, d in enumerate(range(WARMUP_DAYS, D)):
+        e80 = error_quantile_dow(Eerr, full_dow, d, QUANTILE)
+        Nsafe = Nhat[d] + e80
+        _, x_d, c_d, q_d, E_d = daily_lp(price_d[d], Nsafe, np.zeros(T), E0=E0_INIT,
+                                         terminal_eq=True, E_term=E0_INIT)
+        z_d = clip0(np.maximum(N[d] * DT + c_d - x_d - q_d, 0.0))
+        Xr[i] = x_d; Cr[i] = c_d; Qr[i] = q_d; Zr[i] = z_d
+        E_seq.extend(E_d[1:].tolist())
+    Er = np.array(E_seq)                 # 长度 R*T+1
+    plan42 = float((price_d[WARMUP_DAYS:] * Xr).sum())
+    emg42 = float(ALPHA_EM * (price_d[WARMUP_DAYS:] * Zr).sum())
+    cost42 = plan42 + emg42
+
     wb = openpyxl.load_workbook(os.path.join(TEMPLATE_DIR, "result4-2.xlsx"))
     fill_plan_grid(wb["计划购电量"], Xr)
     rebuild_charge_sheet(wb["充放电量"], dates, Cr, Qr, Er)
-    rebuild_emergency_sheet(wb["紧急购电量"], dates, Z, labels)
+    rebuild_emergency_sheet(wb["紧急购电量"], dates, Zr, labels)
     wb.save(os.path.join(out_dir, "result4-2.xlsx"))
 
-    # ============ result4-3: 滚动 MPC (波动电价) ============
-    X3 = np.zeros((REPORT_DAYS, T)); Y3 = np.zeros((REPORT_DAYS, T))
-    C3 = np.zeros((REPORT_DAYS, T)); Q3 = np.zeros((REPORT_DAYS, T))
-    Z3 = np.zeros((REPORT_DAYS, T))
-    E0_arr = np.zeros(REPORT_DAYS); E24_arr = np.zeros(REPORT_DAYS)
+    # ============ result4-3: Q3 模型 + 波动电价 ============
+    X3 = np.zeros((R, T)); Y3 = np.zeros((R, T)); C3 = np.zeros((R, T))
+    Q3 = np.zeros((R, T)); Z3 = np.zeros((R, T))
+    E0_arr = np.zeros(R); E24_arr = np.zeros(R)
     E = E0_INIT
-    total_43 = 0.0
     row = 0
     for d in range(D):
+        delta = issue_risk_delta(over, d, QUANTILE, MIN_HIST)
         E_start = E
-        cost, x, yf, cf, qf, E_end, z = q3_mpc_day(price_d[d], load[d], pv[d], fc, d, E)
+        cost_d, x, yf, cf, qf, E_end, z = q3_mpc_day(price_d[d], load[d], pv[d], fc, d, E, delta)
         E = E_end
         if d >= WARMUP_DAYS:
-            E0_arr[row] = E_start
-            E24_arr[row] = E_end
+            E0_arr[row] = E_start; E24_arr[row] = E_end
             X3[row], Y3[row], C3[row], Q3[row], Z3[row] = x, yf, cf, qf, z
-            total_43 += cost
             row += 1
-    E_flat = np.zeros(REPORT_DAYS * T + 1)
-    for d in range(REPORT_DAYS):
-        E_flat[d * T] = E0_arr[d]
-        E_flat[d * T + T] = E24_arr[d]
+    plan43 = float((price_d[WARMUP_DAYS:] * np.minimum(X3, Y3)).sum())
+    pen43 = float((price_d[WARMUP_DAYS:] * (BETA_PEN * np.maximum(X3 - Y3, 0.0)
+                                            + GAMMA_PRE * np.maximum(Y3 - X3, 0.0))).sum())
+    emg43 = float(ALPHA_EM * (price_d[WARMUP_DAYS:] * Z3).sum())
+    cost43 = plan43 + pen43 + emg43
+
+    E_flat = np.zeros(R * T + 1)
+    for d in range(R):
+        E_flat[d * T] = E0_arr[d]; E_flat[d * T + T] = E24_arr[d]
     wb = openpyxl.load_workbook(os.path.join(TEMPLATE_DIR, "result4-3.xlsx"))
     fill_plan_grid(wb["计划购电量"], X3)
     fill_plan_grid(wb["调整购电量"], Y3)
@@ -68,44 +137,104 @@ def main():
     rebuild_emergency_sheet(wb["紧急购电量"], dates, Z3, labels)
     wb.save(os.path.join(out_dir, "result4-3.xlsx"))
 
-    # ============ 基线 (波动电价) ============
-    b_cost = 0.0
+    # ============ 基线 (波动电价, 同信息集) ============
+    b4 = b4ref = r4 = 0.0
+    Erule = E0_INIT
     for d in range(WARMUP_DAYS, D):
-        b_cost += no_storage(price_d[d], load[d], pv[d])[0]
-    r_cost = 0.0
-    E = E0_INIT
-    for d in range(D):
-        cost_d, _, _, _, Est = rule_arbitrage(price_d[d], load[d], pv[d], E0=E)
-        E = Est[-1]
-        if d >= WARMUP_DAYS:
-            r_cost += cost_d
+        e80 = error_quantile_dow(Eerr, full_dow, d, QUANTILE)
+        Nsafe = Nhat[d] + e80
+        b4 += no_storage_forecast(price_d[d], Nsafe, N[d])[0]
+        b4ref += no_storage(price_d[d], load[d], pv[d])[0]
+        rc, _, _, _, E_end, _ = rule_forecast_day(price_d[d], Nsafe, N[d], Erule)
+        r4 += rc
+        Erule = E_end
+
+    # ============ 诊断参照: 储能 + 完美预见 (A 日闭合 / B 自由结转) ============
+    # A: 与 result4-2 同约束(日闭合 E(0)=E(144)=6000) 但完美预见真实净负荷, 隔离储能侧预报误差成本
+    cost_A = 0.0
+    for d in range(WARMUP_DAYS, D):
+        cA, _, _, _, _ = daily_lp(price_d[d], N[d], np.zeros(T), E0=E0_INIT,
+                                  terminal_eq=True, E_term=E0_INIT)
+        cost_A += cA
+    # B: 全年自由结转(无日闭合), 全局最优理论下界
+    pf = price_d[WARMUP_DAYS:].ravel(); lf = load[WARMUP_DAYS:].ravel(); gv = pv[WARMUP_DAYS:].ravel()
+    cost_B, _, _, _, _ = full_year_lp(pf, lf, gv, E0=E0_INIT, terminal_eq=False)
+
+    # ============ 指标 ============
+    pv_report = float(pv[WARMUP_DAYS:].sum() * DT)
+    emg_energy42 = float(Zr.sum())
+    curt42 = float(clip0(Xr + pv[WARMUP_DAYS:] * DT + Qr - (load[WARMUP_DAYS:] * DT + Cr)).sum())
+    emg_energy43 = float(Z3.sum())
+    curt43 = float(clip0(Y3 + pv[WARMUP_DAYS:] * DT + Q3 - (load[WARMUP_DAYS:] * DT + C3)).sum())
 
     summary = {
         "schema_version": 1,
         "question_id": "Q4",
-        "experiment_id": "round1",
-        "method": "M4-fluctuating-price-LP/MPC",
+        "experiment_id": ROUND,
+        "implementation_target": "python",
+        "method": "M4-inherit-Q2/Q3-final+fluctuating-price",
         "seed": SEED,
+        "approved_decision_id": "q4_method_choice_r2",
         "status": "success",
         "created_at": datetime.now().isoformat(),
         "data_sources": ["data_clean/cleaned_data.pkl"],
         "report_period": "2025-02-01 ~ 2025-12-31",
         "result4_2": {
-            "objective_name": "报告期总购电费(元, 完美预见+波动电价)",
-            "objective_value": round(report_cost_42, 2),
+            "objective_name": "报告期总购电费(元, Q2模型+波动电价)",
+            "objective_value": round(cost42, 2),
+            "plan_cost": round(plan42, 2),
+            "emergency_cost": round(emg42, 2),
             "outputs": ["results/Q4/result4-2.xlsx"],
         },
         "result4_3": {
-            "objective_name": "报告期总购电费(元, MPC+波动电价)",
-            "objective_value": round(total_43, 2),
+            "objective_name": "报告期总购电费(元, Q3模型+波动电价)",
+            "objective_value": round(cost43, 2),
+            "plan_cost": round(plan43, 2),
+            "penalty_cost": round(pen43, 2),
+            "emergency_cost": round(emg43, 2),
             "outputs": ["results/Q4/result4-3.xlsx"],
         },
         "baselines": [
-            {"id": "B4", "name": "无储能(波动电价)", "objective_value": round(b_cost, 2)},
-            {"id": "R4", "name": "规则套利(波动电价)", "objective_value": round(r_cost, 2)},
+            {"id": "B4", "name": "无储能(自预报+星期80分位,波动电价)", "objective_value": round(b4, 2)},
+            {"id": "R4", "name": "规则套利(自预报+星期80分位,波动电价)", "objective_value": round(r4, 2)},
+            {"id": "B4_ref", "name": "无储能完美预见下界(诊断基准,非可执行策略)", "objective_value": round(b4ref, 2)},
         ],
+        "diagnostics": [
+            {"id": "A", "name": "储能完美预见(日闭合,与result4-2同约束)", "objective_value": round(cost_A, 2)},
+            {"id": "B", "name": "储能完美预见(自由结转,全局最优理论下界)", "objective_value": round(cost_B, 2)},
+        ],
+        "metrics": {
+            "result4_2": {
+                "储能价值_元": round(b4 - cost42, 2),
+                "优化价值_元": round(r4 - cost42, 2),
+                "预报误差成本_无储能侧_元": round(b4 - b4ref, 2),
+                "预报误差成本_储能侧_元": round(cost42 - cost_A, 2),
+                "日闭合约束成本_元": round(cost_A - cost_B, 2),
+                "完美预见总价值_储能侧_元": round(cost42 - cost_B, 2),
+                "紧急购电_电量kWh": round(emg_energy42, 2),
+                "弃光_电量kWh": round(curt42, 2),
+                "弃光率": round(curt42 / pv_report, 6),
+                "储电量_min": round(float(Er.min()), 2),
+                "储电量_max": round(float(Er.max()), 2),
+            },
+            "result4_3": {
+                "紧急购电_电量kWh": round(emg_energy43, 2),
+                "弃光_电量kWh": round(curt43, 2),
+                "弃光率": round(curt43 / pv_report, 6),
+                "储电量_E0_min": round(float(E0_arr.min()), 2),
+                "储电量_E0_max": round(float(E0_arr.max()), 2),
+                "储电量_E24_min": round(float(E24_arr.min()), 2),
+                "储电量_E24_max": round(float(E24_arr.max()), 2),
+            },
+        },
+        "fallback_trigger": {
+            "fallback_id": "F4",
+            "condition": "HD3/HD4口径变化或极端电价(0.0076)导致储能解退化",
+            "observed": False,
+            "evidence": None,
+        },
     }
-    with open(os.path.join(out_dir, "experiments", "round1", "run_summary.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(out_dir, "experiments", ROUND, "run_summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
 
     print(json.dumps(summary, ensure_ascii=False, indent=2))

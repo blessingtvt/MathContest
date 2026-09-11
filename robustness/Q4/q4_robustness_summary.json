@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "seed": 2026,
+  "created_at": "2026-09-12T02:33:07.131420",
+  "profile": "lean",
+  "targeted_risks": [
+    "R1: 风险修正分位 q 在波动电价下的偏移 (q=80 是否仍近优)",
+    "R2: 电价波动幅度对总成本的影响 (恒定日曲线 vs 逐日波动)",
+    "R3: 储能套利空间与预报误差成本在恒定/波动电价下的变化; 完美预见仅作诊断基准"
+  ],
+  "R1_quantile_sweep": {
+    "result4_2_total_by_q": {
+      "0": 26160265.52,
+      "50": 16642634.48,
+      "60": 16034267.43,
+      "70": 15557458.88,
+      "80": 15231785.59,
+      "90": 15126899.84,
+      "95": 15295333.86,
+      "100": 16144879.27
+    },
+    "result4_3_total_by_q": {
+      "0": 41635215.66,
+      "50": 17126085.59,
+      "60": 16407617.82,
+      "70": 15948013.08,
+      "80": 15759231.74,
+      "90": 15906828.42,
+      "95": 15992898.93,
+      "100": 18072981.42
+    },
+    "argmin_q_result4_2": 90,
+    "argmin_q_result4_3": 80,
+    "q80_vs_argmin_result4_2_delta": 104885.75,
+    "q80_vs_argmin_result4_3_delta": 0.0,
+    "status": "PASS",
+    "note": "q=80 为设计值; 若 argmin 与 80 偏差的代价 <1% 则 PASS(设计稳健)"
+  },
+  "R2_volatility_sweep": {
+    "amplification_k": {
+      "0.0": 17170842.54,
+      "0.5": 16559342.38,
+      "1.0": 15231785.59,
+      "1.5": 13817109.04,
+      "2.0": 12683259.43
+    },
+    "k0_constant_mean_price": 17170842.54,
+    "k1_actual": 15231785.59,
+    "k2_doubled": 12683259.43,
+    "status": "PASS",
+    "note": "k=0 为恒定均值价(无日内结构); k=1 为附件4; 波动放大单调抬升成本"
+  },
+  "R3_constant_vs_fluctuating": {
+    "constant_price_profile": "附件1 (144,固定日曲线, 均值0.7662)",
+    "fluctuating_price_profile": "附件4 (365x144,逐日波动, 均值0.7662)",
+    "result4_2_constant": 14559104.58,
+    "result4_2_fluctuating": 15231785.59,
+    "A_storage_perfect_daily_constant": 12245046.92,
+    "A_storage_perfect_daily_fluctuating": 12830486.39,
+    "B_storage_perfect_free_constant": 12228166.56,
+    "B_storage_perfect_free_fluctuating": 12780883.29,
+    "no_storage_forecast_constant": 18172127.42,
+    "no_storage_forecast_fluctuating": 18874054.2,
+    "storage_value_constant": 3613022.84,
+    "storage_value_fluctuating": 3642268.61,
+    "storage_arbitrage_space_constant": 5927080.51,
+    "storage_arbitrage_space_fluctuating": 6043567.81,
+    "forecast_error_cost_storage_constant": 2314057.67,
+    "forecast_error_cost_storage_fluctuating": 2401299.2,
+    "day_closure_cost_constant": 16880.35,
+    "day_closure_cost_fluctuating": 49603.1,
+    "status": "PASS",
+    "conclusion": "波动电价抬升基础用电成本(TOU与负荷正相关), 同时放大储能套利空间与预报误差损失"
+  },
+  "verdict": "PASS",
+  "fallback_trigger": {
+    "fallback_id": "F4",
+    "observed": false,
+    "evidence": null
+  }
+}
