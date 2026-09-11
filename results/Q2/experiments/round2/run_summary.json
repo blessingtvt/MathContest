@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "question_id": "Q2",
+  "experiment_id": "round2",
+  "method": "M2-daily-rolling-LP+emergency",
+  "seed": 2026,
+  "status": "success",
+  "created_at": "2026-09-11T12:31:12.104369",
+  "data_sources": [
+    "data_clean/cleaned_data.pkl"
+  ],
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "warmup": "2025-01-01 ~ 2025-01-31 (31天, HD5)",
+  "forecast": "附件3 0:00 日前预报 (非完美预见), 负载用附件2实际值",
+  "approved_decision_id": "q2_method_choice_r2",
+  "main": {
+    "method_id": "M2",
+    "objective_name": "报告期总购电费(元, 含计划+紧急)",
+    "objective_value": 17400028.28,
+    "plan_cost": 12572002.52,
+    "emergency_cost": 4828025.76,
+    "outputs": [
+      "results/Q2/result2.xlsx"
+    ]
+  },
+  "baselines": [
+    {
+      "id": "B2",
+      "name": "无储能(日前预报+紧急)",
+      "objective_value": 20128453.4
+    },
+    {
+      "id": "B2_ref",
+      "name": "无储能(完美预见, 下界)",
+      "objective_value": 16407319.63
+    },
+    {
+      "id": "R2",
+      "name": "规则套利(日前预报)",
+      "objective_value": 18083582.14
+    }
+  ],
+  "metrics": {
+    "储能价值_元": 2728425.12,
+    "储能价值_占比": 0.135551,
+    "优化价值_元": 683553.85,
+    "预报误差成本_无储能": 3721133.77,
+    "紧急购电_区间数": 10880,
+    "紧急购电_电量kWh": 1156618.02,
+    "紧急购电_占比": 0.060655,
+    "弃光_区间数": 16437,
+    "弃光_电量kWh": 2355685.77,
+    "弃光率": 0.123536,
+    "储电量_min": 1200.0,
+    "储电量_max": 10800.0,
+    "终态储电量": 1200.0
+  }
+}

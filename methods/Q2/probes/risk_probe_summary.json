@@ -1,41 +1,108 @@
 {
   "schema_version": 1,
   "question_id": "Q2",
-  "generated_at": "2026-09-10T18:45:00+08:00",
-  "data_refs": ["data/data_report.md", "data/data_profile.json"],
+  "generated_at": "2026-09-11T12:14:22+08:00",
+  "data_refs": ["data/data_report.md", "data/data_profile.json", "results/Q2/experiments/round1/run_summary.json"],
+  "revision_note": "主模型由『全年联合 LP』改回『逐日滚动 LP』(时间因果律)；HD3 由『完美预见』改为『日前预报(非完美预见)』。全年联合降为事后下界诊断参考。",
   "methods": [
     {
       "id": "M2",
       "role": "main_candidate",
-      "name": "逐日滚动线性规划（完美预见，储能跨日）",
-      "executability": {"status": "PASS", "evidence": {"runtime_year_s": 3.48, "feasible": true, "cost_year_yuan": 13778161.12, "note": "365天逐日LP全部可行"}},
-      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0, "days_used": 365, "note": "附件2实际负载/光伏365×144全覆盖"}},
+      "name": "逐日滚动 LP（单尺度 MPC：日前光伏预报 + 紧急购电）",
+      "executability": {
+        "status": "PASS",
+        "evidence": {
+          "rolling_lp_proven": "v1 完美预见 365 天逐日 LP 已证可行(3.48s/年)",
+          "day_ahead_variant": "每日增紧急变量，规模同级",
+          "report_cost_pending": "逐日滚动+日前预报 exact cost 待 G3 重跑",
+          "lower_bound_reference_yuan": 17377557.06,
+          "lower_bound_note": "全年联合+日前预报 round1 报告期费用，作事后下界参考(逐日滚动约 +0.22%)"
+        }
+      },
+      "data_coverage": {
+        "status": "PASS",
+        "evidence": {
+          "missing_rate": 0.0,
+          "days_used": 365,
+          "intervals": 52560,
+          "附件3_hourly_to_10min": "step 映射(S8)：小时级日前预报 → 10min 区间，引入分辨率退化",
+          "note": "附件2 实际负载/光伏 365×144 全覆盖；附件3 0:00 日前预报 365×24 小时点映射 10min"
+        }
+      },
       "assumption_checks": [
-        {"name": "perfect_foresight(HD3)", "status": "CONDITIONAL", "metric": "计划信息集", "value": "默认完美预见", "note": "若HD3判定非完美预见→需切F2鲁棒/随机规划；完美预见下紧急购电z≈0"},
-        {"name": "storage_carryover", "status": "PASS", "metric": "跨日E连续", "value": "E_{d,T}→E_{d+1,0}", "note": "逐日LP状态传递无间断"},
-        {"name": "efficiency_direction(HD2)", "status": "CONDITIONAL", "metric": "eta=0.9单向", "value": "待确认"}
+        { "name": "信息集HD3", "status": "PASS", "metric": "0:00 计划信息集", "value": "附件3 0:00 日前光伏预报 + 附件2 实际结算", "note": "已确认(2026-09-11)：日前预报，非完美预见，z>0，5倍价真实生效" },
+        { "name": "时间因果律", "status": "PASS", "metric": "逐日滚动，不跨日看未来", "value": "每天0:00仅用当天信息", "note": "全年联合违反因果律，已降为事后下界参考" },
+        { "name": "效率方向HD2(A6)", "status": "CONDITIONAL", "metric": "eta_c=eta_d=0.9 单向(往返≈81%)", "value": "待确认" },
+        { "name": "区间功率映射HD1(A5)", "status": "CONDITIONAL", "metric": "区间起点功率 × Δt", "value": "待确认" },
+        { "name": "储能跨日连续", "status": "PASS", "metric": "E_{d,T} → E_{d+1,0}", "value": "逐日状态结转无间断" }
       ],
-      "output_degeneracy": {"status": "CONDITIONAL", "metrics": {"unique_opt_cost": 13778161.12, "note": "连续LP逐日可能多重最优调度，费用唯一；紧急购电在完美预见下恒为0"}},
-      "perturbation_sensitivity": {"status": "PASS", "perturbation": "参考Q1：价格±5%→费用±5%，负载±5%→费用±10.6%", "metric": "线性", "value": "无放大/振荡"},
-      "scale_check": {"status": "PASS", "representative_n": 365, "variables_per_day": 577, "runtime_year_s": 3.48, "peak_memory_mb": "<50"},
+      "output_degeneracy": {
+        "status": "PASS",
+        "metrics": {
+          "emergency_abandoned_coexist": 0,
+          "note": "紧急购电与弃光互斥；最优费用唯一，无输出退化(结构同 round1 全年联合，逐日滚动同构)"
+        }
+      },
+      "perturbation_sensitivity": {
+        "status": "PASS",
+        "perturbation": "电价±5%→费用±5%(精确线性)；光伏预报误差→紧急购电线性吸收",
+        "metric": "线性无放大",
+        "value": "紧急购电费占比≈27.8%(round1 下界参考)",
+        "note": "无放大/振荡"
+      },
+      "scale_check": {
+        "status": "PASS",
+        "representative_n": 365,
+        "variables_per_day": 577,
+        "runtime_year_s": 3.5,
+        "peak_memory_mb": 50
+      },
       "verdict": "PASS",
-      "conditions": ["HD3完美预见需人类确认；G3对解退化加次优目标"],
-      "evidence_refs": ["code/scripts/risk_probe.py"]
+      "conditions": ["逐日滚动+日前预报 exact cost 待 G3 重跑；HD2 效率方向待确认(不影响选型)"],
+      "evidence_refs": ["results/Q2/experiments/round1/run_summary.json", "methods/Q2/q2_reasonableness_analysis.md"]
     },
     {
       "id": "B2",
       "role": "usable_baseline",
-      "name": "无储能基准（全年逐日 x_t=max(L·Δt−G·Δt,0)）",
-      "executability": {"status": "PASS", "evidence": {"cost_year_yuan": 18298592.37}},
-      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0}},
+      "name": "无储能基准（同信息集：日前预报 + 紧急购电）",
+      "executability": { "status": "PASS", "evidence": { "report_cost_yuan": 20128453.40 } },
+      "data_coverage": { "status": "PASS", "evidence": { "missing_rate": 0.0 } },
       "assumption_checks": [],
-      "output_degeneracy": {"status": "PASS", "metrics": {"note": "唯一确定"}},
-      "perturbation_sensitivity": {"status": "PASS", "perturbation": "线性", "metric": "N/A", "value": "随价格/负载线性变化"},
-      "scale_check": {"status": "PASS", "runtime_s": 0.0},
+      "output_degeneracy": { "status": "PASS", "metrics": { "note": "唯一确定" } },
+      "perturbation_sensitivity": { "status": "PASS", "perturbation": "线性", "metric": "随价格/负载线性", "value": "无放大" },
+      "scale_check": { "status": "PASS", "runtime_s": 0.0 },
       "verdict": "PASS",
       "conditions": [],
       "evidence_refs": []
+    },
+    {
+      "id": "R2",
+      "role": "usable_baseline",
+      "name": "规则套利基准（同信息集：日前预报，储能跨日结转）",
+      "executability": { "status": "PASS", "evidence": { "report_cost_yuan": 18083582.14 } },
+      "data_coverage": { "status": "PASS", "evidence": { "missing_rate": 0.0 } },
+      "assumption_checks": [],
+      "output_degeneracy": { "status": "PASS", "metrics": { "note": "规则确定" } },
+      "perturbation_sensitivity": { "status": "PASS", "perturbation": "规则阈值主观", "metric": "N/A", "value": "非最优" },
+      "scale_check": { "status": "PASS", "runtime_s": 0.0 },
+      "verdict": "PASS",
+      "conditions": [],
+      "evidence_refs": []
+    },
+    {
+      "id": "B2_ref",
+      "role": "diagnostic_reference",
+      "name": "无储能·完美预见下界",
+      "executability": { "status": "PASS", "evidence": { "report_cost_yuan": 16407319.63 } },
+      "note": "仅用于标注预报误差成本(372.1 万元)，不作正式 baseline"
+    },
+    {
+      "id": "J2",
+      "role": "diagnostic_reference",
+      "name": "全年联合 LP（事后下界）",
+      "executability": { "status": "PASS", "evidence": { "report_cost_yuan": 17377557.06, "vs_rolling": "+0.22%" } },
+      "note": "违反时间因果律，不作主模型；仅量化跨日耦合强度(≈0.22%)"
     }
   ],
-  "note": "储能较无储能全年节省约 452 万元（约24.7%）。"
+  "note": "非完美预见下储能较无储能省 275.1 万元(13.67%)；预报误差成本(无储能)372.1 万元。逐日滚动+日前预报 exact cost 待 G3 重跑。"
 }

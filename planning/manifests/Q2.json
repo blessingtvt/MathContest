@@ -2,8 +2,8 @@
   "schema_version": 1,
   "question_id": "Q2",
   "rigor_profile": "lean",
-  "current_gate": "G4",
-  "status": "results_frozen_waiting_human",
+  "current_gate": "G3",
+  "status": "code_reviewed",
   "artifacts": {
     "parse": "planning/parse/problem_parse.json",
     "classification": "planning/classification/problem_classification.json",
@@ -16,12 +16,12 @@
     "code_plan": "code/Q2/q2_code_plan.md",
     "code_review": "code/Q2/reviews/q2_python_review.json",
     "final_method_explanation": "methods/Q2/q2_final_method_explanation.md",
-    "latest_run": "results/Q2/experiments/round1/run_summary.json",
+    "latest_run": "results/Q2/experiments/round2/run_summary.json",
     "frozen_numbers": "results/Q2/reports/frozen_numbers.json"
   },
   "allowed": { "code_generation": true, "freeze": true, "paper_writing": false, "final_assembly": false },
   "blockers": [],
-  "assumption_notes": "HD3(完美预见)已确认；HD2/HD5 按默认提案应用（未显式 DECIDED）",
-  "next_action": { "owner": "human", "skill": "workflow-orchestrator", "reason": "G4 冻结完成，待人类确认后进入 G5-G6 论文写作与三重审计" },
-  "updated_at": "2026-09-10T21:00:00+08:00"
+  "assumption_notes": "HD3 已确认=日前预报(非完美预见, 附件3 0:00预报, z>0)；全文采用 MPC 递进框架(Q1静态→Q2逐日滚动→Q3多尺度MPC→Q4波动电价)；全年联合 LP 降为事后下界诊断参考。round2 逐日滚动+日前预报报告期费用 17,400,028.28 元(紧急费占比 27.8%)。",
+  "next_action": { "owner": "human", "skill": "result-judgment", "reason": "G3 通过(逐日滚动+日前预报, 五项审查全 pass)；等待人类判定结果稳定性并冻结 frozen_numbers" },
+  "updated_at": "2026-09-11T12:31:12+08:00"
 }

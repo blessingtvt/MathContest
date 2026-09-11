@@ -31,11 +31,11 @@ rcParams["grid.linewidth"] = 0.4
 
 # 统一配色 (Okabe-Ito 色盲友好)
 C = {
-    "load": "#6F78B9",       # 负载(需求): 近黑
+    "load": "#6F78B9",       # 负载(需求): 绿色
     "pv":   "#FED297",       # 光伏(供给): 淡黄
-    "grid": "#ABE0E4",       # 外网购电: 淡蓝
+    "grid": "#779FC6",       # 外网购电: 淡蓝
     "chg":  "#009E73",       # 储能充电: 绿
-    "dis":  "#FFDBDB",       # 储能放电: 淡fen
+    "dis":  "#7FB3B0",       # 储能放电: 浅绿
     "bound":"#9E9E9E",       # 容量边界: 灰
     "E0":   "#6A3D9A",       # 初始储电量: 紫
     "price":"#404040",       # 电价: 深灰
@@ -69,8 +69,8 @@ def fig1_power_balance(price, load, pv, x, c, q):
                  colors=[C["pv"], C["grid"], C["dis"]],
                  labels=["光伏 $G_t$ (kW)", "购电 $x_t/\\Delta t$ (kW)", "放电 $q_t/\\Delta t$ (kW)"],
                  alpha=0.88, edgecolor="none")
-    # 需求: 负载线(黑) + 负载+充电线(绿虚线 = 供给堆顶)
-    ax.plot(tP, load, color=C["load"], lw=2.4, label="负载 $L_t$ (kW)")
+    # 需求: 负载线(绿) + 负载+充电线(绿虚线 = 供给堆顶)
+    ax.plot(tP, load, color=C["load"], lw=2.8, label="负载 $L_t$ (kW)")
     ax.plot(tP, load + c / DT, color=C["chg"], lw=1.5, ls="--",
             label="负载+充电 $L_t+c_t/\\Delta t$ (kW)")
     _xticks(ax)
