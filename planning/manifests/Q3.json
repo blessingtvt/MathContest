@@ -16,17 +16,20 @@
     "code_plan": "code/Q3/q3_code_plan.md",
     "code_review": "code/Q3/reviews/q3_python_review.json",
     "final_method_explanation": "methods/Q3/q3_final_method_explanation.md",
+    "reasonableness_analysis": "methods/Q3/q3_reasonableness_analysis.md",
+    "forecast_frequency_analysis": "methods/Q3/q3_forecast_frequency_analysis.md",
     "latest_run": "results/Q3/experiments/round3/run_summary.json",
     "robustness_report": "results/Q3/experiments/round3/robustness_report.md",
     "robustness_json": "results/Q3/experiments/round3/robustness_report.json",
     "answer_tables": "results/Q3/q3_answer_tables.md",
-    "figures": "results/Q3/figures/",
+    "figure_plan": "methods/Q3/q3_figure_table_plan.md",
+    "figures": "paper/figures/",
     "result_workbook": "results/Q3/result3.xlsx",
     "frozen_numbers": "results/Q3/reports/frozen_numbers.json"
   },
   "allowed": { "code_generation": false, "freeze": true, "paper_writing": true, "final_assembly": false },
   "blockers": [],
-  "assumption_notes": "G4 完成(round3)：结果判断 M3=15,081,833.10元 < 无储能完美预见下界16,407,319.63元(储能价值+5,046,620.30元)；日闭合 E0=E24=6000 成立；调整价值 B3-M3=2,316,726.58元>0。稳健性：quantile sweep q=80 全局最优且[70,90]平坦；负荷/光伏±5%扰动无断崖(±2~8.5%)；调整阶段消融边际价值 6:00=88.0万/12:00=137.2万/18:00=6.46万(递减)→结论无需引入其他预报时刻(差距主因预报精度非频次)。表1/表2/表3 markdown 已落盘 results/Q3/q3_answer_tables.md，result3.xlsx 4 sheet 完整策略已就绪，5 张图落盘 figures/，数值已冻结 frozen_numbers.json。待 G5 论文撰写。",
-  "next_action": { "owner": "human", "skill": "paper-writer", "reason": "G4 结果判断、稳健性分析、图表与数值冻结完成，待人类确认进入 G5 论文撰写（按表1/2/3格式、result3.xlsx、预报时刻分析结论）" },
-  "updated_at": "2026-09-11T23:36:00+08:00"
+  "assumption_notes": "G4 完成(round3)：结果判断 M3=15,081,833.10元，低于无储能完美预见下界 B3_ref=16,407,319.63元(低 1,325,486.53元)；储能价值=NS_fc(无储能+预报,20,128,453.40)−M3=5,046,620.30元；日闭合 E0=E24=6000 成立；调整价值 B3−M3=2,316,726.58元>0。结果正确性已独立复核(round3)：功率平衡欠供=0、储能 E∈[1200,10800] 且 E0=E24=6000、充放≤5000kW 且互斥、费用 plan+pen+emg=15,081,833.10 逐项吻合(<0.01)。稳健性：quantile sweep q=80 全局最优且[70,90]平坦；负荷/光伏±5%扰动无断崖(±2~8.5%)；调整阶段消融边际价值 6:00=88.0万/12:00=137.2万/18:00=6.46万(递减)→结论无需引入其他预报时刻(差距主因预报精度非频次)。表1/表2/表3 markdown 已落盘 results/Q3/q3_answer_tables.md，result3.xlsx 4 sheet 完整策略已就绪，7 张图落盘 figures/，数值已冻结 frozen_numbers.json。建模思路与方法文档已重写为 round3(q3_final_method_explanation/q3_reasonableness_analysis/q3_forecast_frequency_analysis)。待 G5 论文撰写。",
+  "next_action": { "owner": "human", "skill": "paper-writer", "reason": "G4 结果判断、稳健性、图表与数值冻结完成，建模思路文档已重写为 round3 并含结果表格与正确性检验，待人类确认进入 G5 论文撰写" },
+  "updated_at": "2026-09-12T00:00:00+08:00"
 }

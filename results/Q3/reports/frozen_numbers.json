@@ -64,6 +64,16 @@
   "answer_tables": "results/Q3/q3_answer_tables.md",
   "result_workbook": "results/Q3/result3.xlsx",
   "robustness_report": "results/Q3/experiments/round3/robustness_report.json",
-  "figures_dir": "results/Q3/figures/",
+  "figure_plan": "methods/Q3/q3_figure_table_plan.md",
+  "figures_dir": "paper/figures/",
+  "paper_figures": [
+    "paper/figures/fig_q3_1_mpc_schematic.png",
+    "paper/figures/fig_q3_2_typical_day.png",
+    "paper/figures/fig_q3_3_cost_comparison.png",
+    "paper/figures/fig_q3_4_stage_value.png",
+    "paper/figures/fig_q3_5_quantile_sensitivity.png",
+    "paper/figures/fig_q3_6_perturbation.png",
+    "paper/figures/fig_q3_7_horizon_error.png"
+  ],
   "status": "frozen"
 }
