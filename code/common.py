@@ -237,10 +237,12 @@ def no_storage_dayahead(price, load, pv_actual, forecast, d):
     return cost, x, z
 
 
-def rule_arbitrage(price, load, pv, E0=EMIN, terminal_eq=False):
+def rule_arbitrage(price, load, pv, E0=EMIN, terminal_eq=False, E_term=None):
     """规则峰谷套利基线 (贪心时序模拟)。
 
     低价 1/3 区间充到满、高价 1/3 区间放到空、中价不动; 余下购电补缺口。
+    terminal_eq=True 时在最后 NB=min(24,M) 区间按功率/容量上限把储能拉回 E_term(缺省 E0),
+    实现与 LP 方案一致的日闭合 E(T)=E_term。
     返回 (cost, x, c, q, E)。
     """
     plo, phi = float(np.min(price)), float(np.max(price))
@@ -263,6 +265,24 @@ def rule_arbitrage(price, load, pv, E0=EMIN, terminal_eq=False):
         E = min(max(E, EMIN), EMAX)
         Est[t + 1] = E
         x[t] = max(load[t] * DT + c[t] - pv[t] * DT - q[t], 0.0)
+    if terminal_eq:
+        E_term_val = E_term if E_term is not None else E0
+        NB = min(24, M)
+        E_cur = Est[M - NB]
+        dE = E_term_val - E_cur
+        if abs(dE) > 1e-8:
+            per = dE / NB
+            for t in range(M - NB, M):
+                if per > 0.0:            # 需充电拉回
+                    c[t] = min(PMAX_E, per / ETA_C)
+                    q[t] = 0.0
+                else:                     # 需放电拉回
+                    c[t] = 0.0
+                    q[t] = min(PMAX_E, (-per) * ETA_D)
+                E_cur = E_cur + ETA_C * c[t] - q[t] / ETA_D
+                E_cur = min(max(E_cur, EMIN), EMAX)
+                Est[t + 1] = E_cur
+                x[t] = max(load[t] * DT + c[t] - pv[t] * DT - q[t], 0.0)
     cost = float((price * x).sum())
     return cost, x, c, q, Est
 
@@ -284,11 +304,41 @@ def forecast_intervals(forecast, d, s_idx):
     return ghat
 
 
-def stage_lp(price, load, pv, x_plan, E0):
+def pv_overestimation(forecast, pv):
+    """预计算各 (天, issue) 的光伏高估 o = Ĝ − G (10min 区间, 每块 36 区间)。
+
+    仅取 MPC 实际执行块: issue s 执行 [36s, 36s+36), 预报取 fc[d*4+s, j//6]。
+    返回 (D, 4, 36)。
+    """
+    D = pv.shape[0]
+    over = np.zeros((D, 4, 36))
+    for s in range(4):
+        fc_s = forecast[s::4]              # (D, 24) issue s
+        for j in range(36):
+            over[:, s, j] = fc_s[:, j // 6] - pv[:, 36 * s + j]
+    return over
+
+
+def issue_risk_delta(over, d, quantile=80.0, min_hist=7):
+    """day d 的各 issue 保守裕量 δ[s] = P_q(光伏高估), 因果(仅用 [min_hist, d) 历史)。
+
+    返回长度 4 的 numpy 数组; d <= min_hist 时全 0。
+    """
+    delta = np.zeros(4)
+    if d <= min_hist:
+        return delta
+    hist = over[min_hist:d]                # (d-min_hist, 4, 36)
+    for s in range(4):
+        delta[s] = float(np.percentile(hist[:, s, :], quantile))
+    return delta
+
+
+def stage_lp(price, load, pv, x_plan, E0, terminal_eq=False, E_term=None):
     """Q3 调整阶段 LP (在给定 0:00 计划 x_plan 下, 求剩余时段最优调整 y)。
 
     分段计费线性化: y = u + v, 0≤u≤x_plan(计划内), v≥0(溢价);
     费用 = p·[0.5x + 0.5u + 1.5v], 常数项 0.5x 略去 -> min Σ p(0.5u+1.5v)。
+    terminal_eq=True 时固定 E_M=E_term(缺省 E0), 实现日闭合 E(144)=6000。
     返回 (cost_var, y, c, q, E); y/c/q 长度 M, E 长度 M+1。
     """
     M = len(price)
@@ -329,6 +379,9 @@ def stage_lp(price, load, pv, x_plan, E0):
         A_eq.append(row); b_eq.append(0.0)
     row = np.zeros(n); row[iE(0)] = 1.0
     A_eq.append(row); b_eq.append(E0)
+    if terminal_eq:
+        row = np.zeros(n); row[iE(M)] = 1.0
+        A_eq.append(row); b_eq.append(E_term if E_term is not None else E0)
 
     bounds = [(0, None)] * (4 * M) + [(EMIN, EMAX)] * (M + 1)
     res = linprog(cobj, A_ub=np.array(A_ub), b_ub=np.array(b_ub),
@@ -344,26 +397,34 @@ def stage_lp(price, load, pv, x_plan, E0):
     return float(res.fun), y, c, q, E
 
 
-def q3_mpc_day(price, load_d, pv_actual, forecast, d, E_carry):
-    """Q3 单日滚动 MPC。返回 (cost, x, y_final, c_final, q_final, E_end, z)。"""
-    # 阶段0 (0:00): 计划 x, 用 0:00 预报
-    ghat0 = forecast_intervals(forecast, d, 0)
-    _, x, c0, q0, E0t = daily_lp(price, load_d, ghat0, E0=E_carry, terminal_eq=False)
+def q3_mpc_day(price, load_d, pv_actual, forecast, d, E_carry, delta=None):
+    """Q3 单日滚动 MPC。delta: 各 issue 保守裕量(长度4, 单位 kW), None=不修正。
+
+    返回 (cost, x, y_final, c_final, q_final, E_end, z)。
+    """
+    delta = np.zeros(4) if delta is None else np.asarray(delta, dtype=float)
+    # 阶段0 (0:00): 计划 x, 用 0:00 保守预报 (日闭合 E(144)=E(0)=6000)
+    ghat0 = clip0(forecast_intervals(forecast, d, 0) - delta[0])
+    _, x, c0, q0, E0t = daily_lp(price, load_d, ghat0, E0=E_carry,
+                                 terminal_eq=True, E_term=E0_INIT)
 
     # 阶段1 (6:00): 调整 t∈[36,144)
-    ghat1 = forecast_intervals(forecast, d, 1)
+    ghat1 = clip0(forecast_intervals(forecast, d, 1) - delta[1])
     sl = 36
-    _, y1, c1, q1, E1t = stage_lp(price[sl:], load_d[sl:], ghat1[sl:], x[sl:], E0=E0t[sl])
+    _, y1, c1, q1, E1t = stage_lp(price[sl:], load_d[sl:], ghat1[sl:], x[sl:],
+                                  E0=E0t[sl], terminal_eq=True, E_term=E0_INIT)
 
     # 阶段2 (12:00): 调整 t∈[72,144)
-    ghat2 = forecast_intervals(forecast, d, 2)
+    ghat2 = clip0(forecast_intervals(forecast, d, 2) - delta[2])
     sl = 72
-    _, y2, c2, q2, E2t = stage_lp(price[sl:], load_d[sl:], ghat2[sl:], x[sl:], E0=E1t[sl - 36])
+    _, y2, c2, q2, E2t = stage_lp(price[sl:], load_d[sl:], ghat2[sl:], x[sl:],
+                                  E0=E1t[sl - 36], terminal_eq=True, E_term=E0_INIT)
 
     # 阶段3 (18:00): 调整 t∈[108,144)
-    ghat3 = forecast_intervals(forecast, d, 3)
+    ghat3 = clip0(forecast_intervals(forecast, d, 3) - delta[3])
     sl = 108
-    _, y3, c3, q3, E3t = stage_lp(price[sl:], load_d[sl:], ghat3[sl:], x[sl:], E0=E2t[sl - 72])
+    _, y3, c3, q3, E3t = stage_lp(price[sl:], load_d[sl:], ghat3[sl:], x[sl:],
+                                  E0=E2t[sl - 72], terminal_eq=True, E_term=E0_INIT)
 
     # 拼接最终执行方案
     y_final = np.concatenate([x[:36], y1[:36], y2[:36], y3[:36]])
@@ -381,24 +442,30 @@ def q3_mpc_day(price, load_d, pv_actual, forecast, d, E_carry):
     return cost, x, y_final, c_final, q_final, E_end, z
 
 
-def rule_mpc_day(price, load_d, pv_actual, forecast, d, E_carry):
+def rule_mpc_day(price, load_d, pv_actual, forecast, d, E_carry, delta=None):
     """Q3 基线 R3 (规则套利 + 滚动预报): 与 M3 同信息(滚动预报)、同计费, 仅用贪心规则替代 LP。
 
+    delta: 各 issue 保守裕量(长度4), None=不修正。
     返回 (cost, x, y_final, c_final, q_final, E_end, z)。"""
-    ghat0 = forecast_intervals(forecast, d, 0)
-    _, x, c0, q0, E0t = rule_arbitrage(price, load_d, ghat0, E0=E_carry)
+    delta = np.zeros(4) if delta is None else np.asarray(delta, dtype=float)
+    ghat0 = clip0(forecast_intervals(forecast, d, 0) - delta[0])
+    _, x, c0, q0, E0t = rule_arbitrage(price, load_d, ghat0, E0=E_carry,
+                                       terminal_eq=True, E_term=E0_INIT)
 
-    ghat1 = forecast_intervals(forecast, d, 1)
+    ghat1 = clip0(forecast_intervals(forecast, d, 1) - delta[1])
     sl = 36
-    _, y1, c1, q1, E1t = rule_arbitrage(price[sl:], load_d[sl:], ghat1[sl:], E0=E0t[sl])
+    _, y1, c1, q1, E1t = rule_arbitrage(price[sl:], load_d[sl:], ghat1[sl:], E0=E0t[sl],
+                                        terminal_eq=True, E_term=E0_INIT)
 
-    ghat2 = forecast_intervals(forecast, d, 2)
+    ghat2 = clip0(forecast_intervals(forecast, d, 2) - delta[2])
     sl = 72
-    _, y2, c2, q2, E2t = rule_arbitrage(price[sl:], load_d[sl:], ghat2[sl:], E0=E1t[sl - 36])
+    _, y2, c2, q2, E2t = rule_arbitrage(price[sl:], load_d[sl:], ghat2[sl:], E0=E1t[sl - 36],
+                                        terminal_eq=True, E_term=E0_INIT)
 
-    ghat3 = forecast_intervals(forecast, d, 3)
+    ghat3 = clip0(forecast_intervals(forecast, d, 3) - delta[3])
     sl = 108
-    _, y3, c3, q3, E3t = rule_arbitrage(price[sl:], load_d[sl:], ghat3[sl:], E0=E2t[sl - 72])
+    _, y3, c3, q3, E3t = rule_arbitrage(price[sl:], load_d[sl:], ghat3[sl:], E0=E2t[sl - 72],
+                                        terminal_eq=True, E_term=E0_INIT)
 
     y_final = np.concatenate([x[:36], y1[:36], y2[:36], y3[:36]])
     c_final = np.concatenate([c0[:36], c1[:36], c2[:36], c3[:36]])
@@ -414,12 +481,15 @@ def rule_mpc_day(price, load_d, pv_actual, forecast, d, E_carry):
     return cost, x, y_final, c_final, q_final, E_end, z
 
 
-def q3_static_day(price, load_d, pv_actual, forecast, d, E_carry):
+def q3_static_day(price, load_d, pv_actual, forecast, d, E_carry, delta=None):
     """Q3 基线 B3 (静态不调整): 仅 0:00 计划并执行, 预报误差全由紧急购电吸收。
 
+    delta: 各 issue 保守裕量(长度4), None=不修正。
     返回 (cost, x, c, q, E_end, z)。"""
-    ghat0 = forecast_intervals(forecast, d, 0)
-    _, x, c, q, Et = daily_lp(price, load_d, ghat0, E0=E_carry, terminal_eq=False)
+    delta = np.zeros(4) if delta is None else np.asarray(delta, dtype=float)
+    ghat0 = clip0(forecast_intervals(forecast, d, 0) - delta[0])
+    _, x, c, q, Et = daily_lp(price, load_d, ghat0, E0=E_carry,
+                              terminal_eq=True, E_term=E0_INIT)
     z = np.maximum(load_d * DT + c - x - pv_actual * DT - q, 0.0)
     z = clip0(z)
     cost = float((price * x).sum() + ALPHA_EM * (price * z).sum())

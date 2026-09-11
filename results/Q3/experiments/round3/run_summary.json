@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "experiment_id": "round3",
+  "method": "M3-MPC+piecewise-billing+terminal-daily-cycle+issue-80pct-pv-risk-correction",
+  "seed": 2026,
+  "status": "success",
+  "created_at": "2026-09-11T23:00:42.066762",
+  "data_sources": [
+    "data_clean/cleaned_data.pkl"
+  ],
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "risk_correction": {
+    "axis": "issue(0/6/12/18)",
+    "quantile": 80.0,
+    "min_hist_days": 7,
+    "formula": "Ghat_safe = clip0(Ghat - delta[issue]), delta[s]=P80(Ghat-G)",
+    "delta_issue_kW": [
+      0.0,
+      1005.49,
+      -6.27,
+      0.0
+    ]
+  },
+  "main": {
+    "method_id": "M3",
+    "objective_name": "报告期总购电费(元, 含违约/溢价/紧急)",
+    "objective_value": 15081833.1,
+    "plan_cost": 12370352.13,
+    "penalty_cost": 1798546.56,
+    "emergency_cost": 912934.41,
+    "outputs": [
+      "results/Q3/result3.xlsx"
+    ]
+  },
+  "baselines": [
+    {
+      "id": "B3",
+      "name": "静态不调整(日闭合+修正)",
+      "objective_value": 17398559.68
+    },
+    {
+      "id": "R3",
+      "name": "规则套利(日闭合+修正)",
+      "objective_value": 17753485.91
+    },
+    {
+      "id": "B3_ref",
+      "name": "无储能(完美预见,下界)",
+      "objective_value": 16407319.63
+    }
+  ],
+  "metrics": {
+    "调整价值_元": 2316726.58,
+    "优化价值_元": 2671652.81,
+    "储能价值_元_vs无储能预报": 5046620.3,
+    "紧急购电_电量kWh": 245793.57,
+    "弃光_电量kWh": 2812018.61,
+    "弃光率": 0.147466,
+    "储电量_E0_min": 6000.0,
+    "储电量_E0_max": 6000.0,
+    "储电量_E24_min": 6000.0,
+    "储电量_E24_max": 6000.0
+  },
+  "sensitivity": {
+    "scheme_A_no_correction": {
+      "total_cost": 16970240.79,
+      "emergency_cost": 4170246.79,
+      "curtailment_kWh": 2103623.51
+    },
+    "scheme_B_issue_80pct": {
+      "total_cost": 15081833.1,
+      "emergency_cost": 912934.41,
+      "curtailment_kWh": 2812018.61
+    }
+  }
+}

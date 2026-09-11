@@ -5,17 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c3205259-df34-4b4b-bb26-7142e951bb0d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../Q2/make_q2_figures_round3.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Q2/make_q2_figures_round3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Q2/q2_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Q2/q2_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Q2/q2_robustness.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Q2/q2_robustness.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Q3/q3_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Q3/q3_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common.py" beforeDir="false" afterPath="$PROJECT_DIR$/../common.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../methods/Q2/q2_final_method_explanation.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../methods/Q2/q2_final_method_explanation.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/Q2/q2_answer_tables.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q2/q2_answer_tables.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/Q2/reports/freeze_change_log.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q2/reports/freeze_change_log.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/Q2/reports/frozen_numbers.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q2/reports/frozen_numbers.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/Q2/reports/q2_final_result_analysis.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q2/reports/q2_final_result_analysis.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/Q2/result2.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q2/result2.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../robustness/Q2/q2_robustness_summary.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../robustness/Q2/q2_robustness_summary.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../methods/Q3/q3_decisions.jsonl" beforeDir="false" afterPath="$PROJECT_DIR$/../../methods/Q3/q3_decisions.jsonl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../methods/Q3/q3_method_card.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../methods/Q3/q3_method_card.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../paper/reference_audit.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../paper/refs.bib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../planning/manifests/Q3.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../planning/manifests/Q3.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +66,7 @@
       <workItem from="1789036973405" duration="109000" />
       <workItem from="1789037611819" duration="4482000" />
       <workItem from="1789055076783" duration="1910000" />
-      <workItem from="1789116692533" duration="6371000" />
+      <workItem from="1789116692533" duration="8155000" />
     </task>
     <servers />
   </component>

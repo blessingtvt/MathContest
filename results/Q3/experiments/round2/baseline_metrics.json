@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "experiment_id": "round2",
+  "seed": 2026,
+  "created_at": "2026-09-11T22:31:50.148562",
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "baselines": [
+    {
+      "id": "B3",
+      "name": "静态不调整(日闭合)",
+      "objective_value": 17398559.68
+    },
+    {
+      "id": "R3",
+      "name": "规则套利(日闭合)",
+      "objective_value": 18631663.09
+    },
+    {
+      "id": "B3_ref",
+      "name": "无储能(完美预见,下界)",
+      "objective_value": 16407319.63
+    }
+  ]
+}

@@ -3,73 +3,89 @@
   "question_id": "Q3",
   "reviewer": "python-code-reviewer",
   "language": "python",
+  "round": "round3",
   "files_reviewed": ["code/common.py", "code/Q3/q3_main.py", "code/Q3/q3_baseline.py"],
-  "created_at": "2026-09-10",
+  "created_at": "2026-09-11T23:05:00+08:00",
   "verdict": "pass",
   "checks": [
     {
       "id": "syntax",
       "name": "语法/可执行性",
       "status": "pass",
-      "evidence": "q3_main.py 与 q3_baseline.py 均运行成功；每日 4 阶段 LP/贪心全部收敛，无异常。"
+      "evidence": "q3_main.py 与 q3_baseline.py 均运行成功（experiments/round3 落盘）；每日 0:00 单日 LP + 6/12/18 三段调整 LP 与规则贪心全部收敛，无异常。"
     },
     {
       "id": "semantics",
       "name": "代码语义",
       "status": "pass",
-      "evidence": "stage_lp 用 u（计划内, 系数 0.5p）与 v（溢价, 系数 1.5p）分解 y；能量平衡 -u-v-q+c <= pv*dt-load*dt；结算 z 用实际光伏（pv_actual）与最终方案 y_final/c_final/q_final。"
+      "evidence": "新增 pv_overestimation 预计算各(天,issue)高估 o=Ĝ−G（仅取 MPC 实际执行块 [36s,36s+36)，预报取 fc[d*4+s, j//6]）；issue_risk_delta 因果取 P80(高估)（仅用 [min_hist,d) 历史）；q3_mpc_day/rule_mpc_day/q3_static_day 均以 Ĝ^safe=clip0(Ĝ−δ[issue]) 做规划、以附件2实际值结算。日闭合与分段计费(HD4)不变。"
     },
     {
       "id": "logic",
       "name": "逻辑正确性",
       "status": "pass",
-      "evidence": "分段计费线性化等价：min Σp(0.5u+1.5v) 且 u≤x_plan 使 u*=min(y,x_plan)、v*=max(y−x_plan,0)，还原 p·(min+0.5·违约+1.5·溢价)。数值核验 day150：z 与 max(−gap,0) 一致（allclose），紧急购电恰好补齐实际缺口。"
+      "evidence": "保守光伏把「光伏高估→缺口→5倍紧急」转成「光伏低估→弃光」：结算 z=max(load·Δt+c−y−pv_actual·Δt−q,0) 与弃光 clip0(supply−demand) 互斥。δ[6:00]=1005.49kW 对应 6:00 预报系统性高估(P80)，δ 其余≈0；修正后紧急 4.17M→0.91M、弃光 2.10M→2.81M kWh，方向正确。"
     },
     {
       "id": "boundary",
       "name": "边界/极限",
       "status": "pass",
-      "evidence": "调整时段拼接 sl∈{36,72,108}，y_final 恒为 144 长；预报映射 forecast_intervals：区间 t（小时 t//6）→ forecast[d*4+s, t//6−6s]，覆盖小时 [6s,24)；紧急购电 clip0 保证 z≥0。"
+      "evidence": "日闭合边界成立：E0_min=E0_max=E24_min=E24_max=6000.0；E∈[1200,10800]、c/q∈[0,PMAX_E] 由 bounds 与 clamp 保证；d≤min_hist 时 δ=0 不修正（无历史不回看）；Ĝ^safe 经 clip0 保证非负。"
     },
     {
       "id": "input_contract",
       "name": "输入契约",
       "status": "pass",
-      "evidence": "仅读取 data_clean/cleaned_data.pkl（附件1.price、附件2_load/pv、附件3.forecast），未修改 data_raw；负荷恒用实际值、光伏按滚动预报+实际值结算。"
+      "evidence": "仅读取 data_clean/cleaned_data.pkl（附件1/2/3），未修改 data_raw；风险修正 δ 仅由 d 之前历史（因果），不引入未来信息；SEED=2026 已固定。"
     },
     {
       "id": "output_contract",
       "name": "输出契约",
       "status": "pass",
-      "evidence": "result3.xlsx 含「计划购电量」「调整购电量」「充放电量」「紧急购电量」四 sheet，均为 335×147/334 天；紧急购电量 sheet 仅写 z>0 的稀疏行。run_summary.json（含 plan/penalty/emergency 三段分解）、baseline_metrics.json 落盘。"
+      "evidence": "result3.xlsx 四 sheet 落盘（方案B）；run_summary.json 含 main/baselines/metrics/sensitivity 与 risk_correction；baseline_metrics.json 落盘 experiments/round3。"
     },
     {
       "id": "method_alignment",
       "name": "方法对齐",
       "status": "pass",
-      "evidence": "M3=滚动 MPC（G2 批准）；B3=静态不调整（q3_static_day）；R3=rule_mpc_day（滚动预报+同计费，与 M3 同信息可比）。"
+      "evidence": "M3=滚动 MPC+分段计费线性化+日闭合+按 issue 80分位光伏风险修正（决策 q3_risk_correction_r2，与 methods/Q3/q3_method_card.md 一致）；B3/R3 同修正口径；方案A(无修正)作为敏感性对照。"
     },
     {
       "id": "reproducibility",
       "name": "可复现性",
       "status": "pass",
-      "evidence": "SEED=2026；确定性 LP/贪心，无随机量；跨日结转 E 确定性。"
+      "evidence": "SEED=2026；确定性 LP（HiGHS）与确定性贪心，无随机量；δ 由确定性历史误差分位给出，跨日结转 E 确定性。"
     }
   ],
   "numeric_verification": {
-    "objective_value": 16972663.03,
-    "plan_cost": 12267607.43,
-    "penalty_cost": 533502.66,
-    "emergency_cost": 4171552.94,
-    "baseline_B3": 17400028.28,
-    "baseline_R3": 18065256.61,
-    "adjustment_value_yuan": 427365.25,
-    "optimization_value_yuan": 1092593.58,
-    "day150_z_matches_gap": true
+    "objective_value": 15081833.10,
+    "plan_cost": 12370352.13,
+    "penalty_cost": 1798546.56,
+    "emergency_cost": 912934.41,
+    "baseline_B3": 17398559.68,
+    "baseline_R3": 17753485.91,
+    "baseline_B3_ref_no_storage_perfect": 16407319.63,
+    "no_storage_forecast_baseline": 20128453.40,
+    "adjustment_value_yuan": 2316726.58,
+    "optimization_value_yuan": 2671652.81,
+    "storage_value_vs_no_storage_forecast": 5046620.30,
+    "emergency_energy_kwh": 245793.57,
+    "curtailment_kwh": 2812018.61,
+    "curtailment_rate": 0.147466,
+    "E0_min": 6000.0, "E0_max": 6000.0, "E24_min": 6000.0, "E24_max": 6000.0,
+    "day_closure_verified": true,
+    "scheme_A_total": 16970240.79, "scheme_A_emergency": 4170246.79, "scheme_A_curtailment": 2103623.51,
+    "scheme_B_total": 15081833.10, "scheme_B_emergency": 912934.41, "scheme_B_curtailment": 2812018.61,
+    "correction_value_yuan": 1888407.69,
+    "quantile_sweep_total": {"q0": 40292445.97, "q50": 16475451.91, "q60": 15748617.22, "q70": 15274877.01, "q80": 15081833.10, "q90": 15223234.82, "q95": 15305807.28, "q100": 17342968.42}
   },
   "issues": [],
   "notes": [
-    "MPC 阶段间储能状态沿用计划轨迹（不引入 6/12/18 点的实际状态重观测），为简化假设，M3/R3 一致，不影响可比性。",
-    "目标值 = plan + penalty + emergency 三段闭合（16972663.03 = 12267607.43 + 533502.66 + 4171552.94）。"
+    "风险修正生效：M3 由方案A 16,970,240.79 元降至方案B 15,081,833.10 元（−1,888,407.69 元，−11.1%）；紧急购电 4.17M→0.91M（−78%），弃光 2.10M→2.81M kWh（+33.7%）。",
+    "M3 现已低于无储能·完美预见下界 16,407,319.63 元，储能价值相对无储能+附件3预报达 +5,046,620.30 元。",
+    "80 分位非任意：quantile sweep 显示 q=80 使总费用最小（15,081,833.10 元），q∈[70,90] 曲线平坦（15.08~15.27M），稳健。",
+    "价值分解：B3(静态,无修正)17.40M → 方案A(MPC,无修正)16.97M（调整价值 +0.43M）→ 方案B(MPC,修正)15.08M（修正价值 +1.89M）。",
+    "B3 静态仅用 0:00 预报，其短视距块 δ[0]=0 故不受修正影响；风险修正主要作用于 6:00 issue（滚动 MPC 重规划用），属 MPC 与修正的合理耦合。",
+    "分段计费下保守规划使违约(0.5×)由 0.53M 升至 1.80M，但远小于紧急(5×)的 3.26M 下降，净节省 1.89M。"
   ]
 }

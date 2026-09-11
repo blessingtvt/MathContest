@@ -36,6 +36,9 @@
 | 典型日调度 | `paper/figures/fig_q2_3_representative_day.png` | 论文正式(3) |
 | 月度费用 | `paper/figures/fig_q2_4_monthly_cost.png` | 附录(4) |
 | 紧急购电季节性 | `paper/figures/fig_q2_5_seasonal_emergency.png` | 论文正式(3) |
+| 净负荷周周期(ACF) | `paper/figures/fig_q2_6_netload_acf.png` | 论文正式(3) |
+| 分桶前后对比 | `paper/figures/fig_q2_7_dow_bucket_effect.png` | 论文正式(3) |
+| 储能日充放 | `paper/figures/fig_q2_8_storage_daily.png` | 附录(4) |
 | 指定日期结果表 | `results/Q2/q2_answer_tables.md` | 论文正式(3) |
 | 主结果表 | `results/Q2/reports/frozen_numbers.json` | 论文正式(3) |
 

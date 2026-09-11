@@ -238,6 +238,84 @@ def main():
     fig.savefig(os.path.join(FIG_DIR, 'fig_q2_5_seasonal_emergency.png'), dpi=300)
     plt.close(fig)
 
+    # ---- fig 6: 净负荷周周期 (ACF) vs 预报加权衰减 ----
+    daily_nl = (N.sum(axis=1)) * DT          # 全年日净负荷电量 (365 天)
+    def _acf(x, k):
+        x = x - x.mean()
+        return float(np.sum(x[:-k] * x[k:]) / np.sum(x * x))
+    lags = np.arange(1, 29)
+    acf_vals = [_acf(daily_nl, k) for k in lags]
+    acf1 = _acf(daily_nl, 1); acf7 = _acf(daily_nl, 7)
+    fig, (axa, axb) = plt.subplots(1, 2, figsize=(9.0, 3.6),
+                                   gridspec_kw={'width_ratios': [2.4, 1]})
+    colors = [PALETTE['rose_d'] if k % 7 == 0 else PALETTE['slate'] for k in lags]
+    axa.bar(lags, acf_vals, color=colors, alpha=0.85, width=0.6)
+    axa.axhline(0, color=PALETTE['gray'], lw=0.8)
+    axa.annotate(f'lag-7 ≈ {acf7:.2f}\n（周周期）', xy=(7, acf7), xytext=(10, acf7 - 0.18),
+                 fontsize=8, color=PALETTE['rose_d'],
+                 arrowprops=dict(arrowstyle='->', color=PALETTE['rose_d'], lw=0.9))
+    axa.annotate(f'lag-1 ≈ {acf1:.2f}', xy=(1, acf1), xytext=(5, acf1 + 0.16),
+                 fontsize=8, color=PALETTE['slate'])
+    axa.set_xlabel('滞后天数 k'); axa.set_ylabel('净负荷自相关 ACF')
+    axa.set_title('（a）日净负荷：滞后 7 天尖峰', fontsize=9, color=PALETTE['ink'])
+    axa.set_xticks([1, 7, 14, 21, 28])
+    axa.grid(alpha=0.25, color=PALETTE['gray'])
+    wk = np.arange(1, 8)
+    axb.bar(wk, W, color=PALETTE['taupe'], alpha=0.85, width=0.6)
+    axb.set_xlabel('滞后天数 k'); axb.set_ylabel('预报权重 w_k')
+    axb.set_title('（b）自预报权重：按天衰减', fontsize=9, color=PALETTE['ink'])
+    axb.set_xticks([1, 2, 3, 4, 5, 6, 7])
+    axb.grid(alpha=0.25, color=PALETTE['gray'])
+    fig.suptitle('周周期与预报加权错配：真相关在 lag-7 峰值，权重却把 lag-1 赋最高', fontsize=10.5, color=PALETTE['ink'])
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG_DIR, 'fig_q2_6_netload_acf.png'), dpi=300)
+    plt.close(fig)
+
+    # ---- fig 7: 分桶前后各星期几日均紧急购电 ----
+    _, _, _, Zr_glob, _, _ = run_full_report(price, N, Nhat, Eerr, 80.0, None)  # round3 全局对照
+    report_dow = full_dow[WARMUP_DAYS:]
+    emg_glob_day = Zr_glob.sum(axis=1)
+    emg_dow_day = Zr.sum(axis=1)
+    wn = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    g = [emg_glob_day[report_dow == w].mean() for w in range(7)]
+    d = [emg_dow_day[report_dow == w].mean() for w in range(7)]
+    x = np.arange(7)
+    fig, ax = plt.subplots(figsize=(6.4, 3.8))
+    ax.bar(x - 0.2, g, width=0.4, color=PALETTE['rose'], alpha=0.85, label='全局 80 分位（round3）')
+    ax.bar(x + 0.2, d, width=0.4, color=PALETTE['slate'], alpha=0.85, label='按星期分桶（round4）')
+    ax.set_xticks(x); ax.set_xticklabels(wn, fontsize=9)
+    ax.set_ylabel('日均紧急购电量 (kWh)')
+    ax.legend(fontsize=8, frameon=False)
+    ax.grid(axis='y', alpha=0.25, color=PALETTE['gray'])
+    ax.annotate(f'周日尖峰 {g[6]:.0f} → {d[6]:.0f}',
+                xy=(6, d[6]), xytext=(3.4, g[6] * 0.86), fontsize=8, color=PALETTE['rose_d'],
+                arrowprops=dict(arrowstyle='->', color=PALETTE['rose_d'], lw=0.9))
+    fig.suptitle('按星期分桶效果：消除周日系统性低估尖峰', fontsize=10.5, color=PALETTE['ink'])
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG_DIR, 'fig_q2_7_dow_bucket_effect.png'), dpi=300)
+    plt.close(fig)
+
+    # ---- fig 8: 储能全年日充/日放 ----
+    charge_day = Cr.sum(axis=1); disch_day = Qr.sum(axis=1)
+    ratio = float(disch_day.sum() / charge_day.sum())
+    xx = np.arange(REPORT_DAYS)
+    fig, ax = plt.subplots(figsize=(8.6, 3.4))
+    ax.plot(xx, charge_day / 1e3, color=PALETTE['sage_d'], lw=1.2, label='日充电量')
+    ax.plot(xx, disch_day / 1e3, color=PALETTE['taupe'], lw=1.2, label='日放电量')
+    ax.set_ylabel('日充/放电量\n(MWh)', fontsize=9)
+    ax.set_xlabel('日期')
+    ax.legend(fontsize=8, frameon=False)
+    ax.grid(alpha=0.25, color=PALETTE['gray'])
+    month_starts = [0] + [i for i in range(1, REPORT_DAYS) if dates[i].month != dates[i - 1].month]
+    ax.set_xticks(month_starts)
+    ax.set_xticklabels([f'{dates[i].month}月' for i in month_starts], fontsize=8)
+    ax.text(0.02, 0.94, f'全年 Σ放电/Σ充电 = {ratio:.4f}（= η_c·η_d = 0.81）',
+            transform=ax.transAxes, fontsize=9, color=PALETTE['ink'])
+    fig.suptitle('储能全年持续运行：日充/日放几乎成对出现', fontsize=10.5, color=PALETTE['ink'])
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG_DIR, 'fig_q2_8_storage_daily.png'), dpi=300)
+    plt.close(fig)
+
     # 季节性统计摘要（用于解释）
     emg_days_m, emg_energy_m = {}, {}
     for i, d in enumerate(dates):
@@ -251,7 +329,8 @@ def main():
     print('figures written to', FIG_DIR)
     for f in ['fig_q2_1_quantile_sensitivity.png', 'fig_q2_2_baseline_comparison.png',
               'fig_q2_3_representative_day.png', 'fig_q2_4_monthly_cost.png',
-              'fig_q2_5_seasonal_emergency.png']:
+              'fig_q2_5_seasonal_emergency.png', 'fig_q2_6_netload_acf.png',
+              'fig_q2_7_dow_bucket_effect.png', 'fig_q2_8_storage_daily.png']:
         p = os.path.join(FIG_DIR, f)
         print(' ', p, os.path.getsize(p), 'bytes')
 
