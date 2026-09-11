@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Q2 round3 稳健性/敏感性实验 (robustness-checker)。
+"""Q2 round4 稳健性/敏感性实验 (robustness-checker)。
 
-针对 round3 模型 M2 (逐日滚动 LP + 附件2历史自预报 + 80分位风险修正) 的
+针对 round4 模型 M2 (逐日滚动 LP + 附件2历史自预报 + 80分位按星期分桶风险修正) 的
 load-bearing 假设做定向检验, 不堆砌无关测试:
 
   R1  风险分位 q 敏感性 (报童临界比 0.8 是否为最优)
@@ -34,13 +34,18 @@ def make_forecast(N, w):
     return Nhat, N - Nhat
 
 
-def sim_report(price, N, Nhat, Eerr, quantile, daily_cycle=True):
-    """逐日滚动报告期模拟。返回报告期费用与紧急购电指标。"""
+def sim_report(price, N, Nhat, Eerr, quantile, daily_cycle=True, full_dow=None):
+    """逐日滚动报告期模拟。返回报告期费用与紧急购电指标。
+    full_dow: 星期索引(0=周一..6=周日), 非 None 则按星期分桶 e_q[dow] (round4)。"""
     plan = emg = emg_energy = 0.0
     emg_int = 0
     E0 = E0_INIT
     for d in range(WARMUP_DAYS, N.shape[0]):
-        e_q = np.percentile(Eerr[7:d], quantile, axis=0) if d > 7 else np.zeros(T)
+        if full_dow is not None:
+            hist = Eerr[7:d]; hd = full_dow[7:d]; mask = hd == full_dow[d]
+            e_q = np.percentile(hist[mask], quantile, axis=0) if mask.sum() > 0 else np.zeros(T)
+        else:
+            e_q = np.percentile(Eerr[7:d], quantile, axis=0) if d > 7 else np.zeros(T)
         Nsafe = Nhat[d] + e_q
         _, x, c, q, Est = daily_lp(price, Nsafe, np.zeros(T), E0=E0,
                                    terminal_eq=daily_cycle,
@@ -64,15 +69,17 @@ def main():
     pv = b['附件2_pv']
     D = load.shape[0]
     N = load - pv
+    full_dow = np.array([datetime.strptime(s, "%Y-%m-%d %H:%M:%S").weekday()
+                         for s in b['dates']])
 
     W = np.array([0.3, 0.2, 0.15, 0.12, 0.1, 0.08, 0.05])
     Nhat_base, Eerr_base = make_forecast(N, W)
 
     out = {}
 
-    # ---- R1 风险分位敏感性 ----
+    # ---- R1 风险分位敏感性 (按星期分桶) ----
     qs = [0, 30, 50, 70, 80, 90, 95, 99]
-    r1 = {str(q): sim_report(price, N, Nhat_base, Eerr_base, q, True) for q in qs}
+    r1 = {str(q): sim_report(price, N, Nhat_base, Eerr_base, q, True, full_dow) for q in qs}
     totals = {q: r1[str(q)]['total'] for q in qs}
     q_star = min(totals, key=totals.get)
     out['R1_quantile'] = {
@@ -93,13 +100,13 @@ def main():
     r2 = {}
     for label, w in windows:
         Nhat, Eerr = make_forecast(N, w)
-        r2[label] = sim_report(price, N, Nhat, Eerr, 80, True)
+        r2[label] = sim_report(price, N, Nhat, Eerr, 80, True, full_dow)
     out['R2_window'] = r2
 
     # ---- R3 效率口径 HD2 (固定 q=80, 基准窗口) ----
-    r3_base = sim_report(price, N, Nhat_base, Eerr_base, 80, True)   # 单向 η=0.9 (往返0.81)
+    r3_base = sim_report(price, N, Nhat_base, Eerr_base, 80, True, full_dow)   # 单向 η=0.9 (往返0.81)
     common.ETA_C = common.ETA_D = float(np.sqrt(0.9))                 # 往返0.9
-    r3_rt = sim_report(price, N, Nhat_base, Eerr_base, 80, True)
+    r3_rt = sim_report(price, N, Nhat_base, Eerr_base, 80, True, full_dow)
     common.ETA_C = common.ETA_D = 0.9                                 # 还原
     out['R3_efficiency'] = {
         'eta_single_0.9_roundtrip_0.81': r3_base,
@@ -109,19 +116,19 @@ def main():
     # ---- R4 电价线性扰动 (固定 q=80) ----
     r4 = {}
     for k in [0.90, 0.95, 1.00, 1.05, 1.10]:
-        r4[f'price_x{k:.2f}'] = sim_report(price * k, N, Nhat_base, Eerr_base, 80, True)
+        r4[f'price_x{k:.2f}'] = sim_report(price * k, N, Nhat_base, Eerr_base, 80, True, full_dow)
     out['R4_price'] = r4
 
     # ---- R5 日末循环 vs 自由终态 (固定 q=80) ----
     out['R5_terminal'] = {
-        'daily_cycle_S144_eq_S0': sim_report(price, N, Nhat_base, Eerr_base, 80, True),
-        'free_terminal': sim_report(price, N, Nhat_base, Eerr_base, 80, False),
+        'daily_cycle_S144_eq_S0': sim_report(price, N, Nhat_base, Eerr_base, 80, True, full_dow),
+        'free_terminal': sim_report(price, N, Nhat_base, Eerr_base, 80, False, full_dow),
     }
 
     # ---- 汇总写盘 ----
     out['meta'] = {
         'question_id': 'Q2',
-        'model': 'M2-daily-rolling-LP+self-forecast+risk-correction(q80)',
+        'model': 'M2-daily-rolling-LP+self-forecast+risk-correction(q80,dow-bucketed)',
         'seed': SEED,
         'generated_at': datetime.now().isoformat(),
         'report_period': '2025-02-01 ~ 2025-12-31',

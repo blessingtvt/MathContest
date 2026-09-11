@@ -1,108 +1,201 @@
 {
-  "schema_version": 1,
-  "question_id": "Q2",
-  "generated_at": "2026-09-11T17:10:00+08:00",
-  "rigor_profile": "lean",
-  "model": "M2-daily-rolling-LP+self-forecast+risk-correction(q80)",
-  "seed": 2026,
-  "report_period": "2025-02-01 ~ 2025-12-31",
-  "data_source": "data_clean/cleaned_data.pkl",
-  "baseline_total_M2": 17741097.14,
-  "checks": [
-    {
-      "id": "R1",
-      "tested_claim": "报童临界比 (α_em−1)/(α_em−1+1)=4/5=0.8 → 风险分位 q=80 最小化报告期总费用",
-      "assumption": "风险分位 q=80 为最优",
-      "input_sources": ["data_clean/cleaned_data.pkl"],
-      "result_sources": ["results/Q2/experiments/round3/run_summary.json"],
-      "perturbation": "q ∈ {0, 30, 50, 70, 80, 90, 95, 99}，历史误差分位数风险修正",
-      "metric": "报告期总费用(元) / 紧急购电费占比",
-      "threshold": "q=80 处总费用最低（报童临界比 0.8，先验声明）",
-      "observed": {
-        "q0": 57567252.07, "q30": 26403078.64, "q50": 20105495.72,
-        "q70": 18223007.92, "q80": 17741097.14, "q90": 17793134.79,
-        "q95": 18228658.05, "q99": 19503771.29,
-        "argmin_q": 80,
-        "emergency_share_q0": 0.9276, "emergency_share_q80": 0.1128, "emergency_share_q90": 0.0475
+  "R1_quantile": {
+    "sweep": {
+      "0": {
+        "total": 25093998.32,
+        "plan": 9998224.83,
+        "emg": 15095773.5,
+        "emg_energy": 3893566.46,
+        "emg_intervals": 41728,
+        "emg_share": 0.601569
       },
-      "status": "PASS",
-      "limitation": "分位修正为逐区间独立分位，未建模日内相关性；q=0(无修正)费用暴涨 3.2 倍，验证风险修正不可或缺",
-      "fallback_relevance": "若最优分位显著偏离 80 需重估 α_em 口径；实测 argmin=80 与理论一致"
+      "30": {
+        "total": 17575991.73,
+        "plan": 11559250.39,
+        "emg": 6016741.35,
+        "emg_energy": 1553224.27,
+        "emg_intervals": 31973,
+        "emg_share": 0.342327
+      },
+      "50": {
+        "total": 15913613.91,
+        "plan": 12088716.09,
+        "emg": 3824897.83,
+        "emg_energy": 986345.76,
+        "emg_intervals": 24339,
+        "emg_share": 0.240354
+      },
+      "70": {
+        "total": 14870741.86,
+        "plan": 12650871.8,
+        "emg": 2219870.05,
+        "emg_energy": 569192.75,
+        "emg_intervals": 16200,
+        "emg_share": 0.149278
+      },
+      "80": {
+        "total": 14559104.58,
+        "plan": 13008179.66,
+        "emg": 1550924.93,
+        "emg_energy": 396939.32,
+        "emg_intervals": 11977,
+        "emg_share": 0.106526
+      },
+      "90": {
+        "total": 14461289.17,
+        "plan": 13528799.4,
+        "emg": 932489.77,
+        "emg_energy": 238152.84,
+        "emg_intervals": 7506,
+        "emg_share": 0.064482
+      },
+      "95": {
+        "total": 14624319.15,
+        "plan": 13986562.37,
+        "emg": 637756.78,
+        "emg_energy": 162660.19,
+        "emg_intervals": 5220,
+        "emg_share": 0.043609
+      },
+      "99": {
+        "total": 15197625.85,
+        "plan": 14780409.06,
+        "emg": 417216.79,
+        "emg_energy": 106723.9,
+        "emg_intervals": 3403,
+        "emg_share": 0.027453
+      }
     },
-    {
-      "id": "R2",
-      "tested_claim": "7 天加权平均净负荷预报是稳健选择",
-      "assumption": "预报窗口与加权方案",
-      "input_sources": ["data_clean/cleaned_data.pkl"],
-      "result_sources": ["robustness/Q2/q2_robustness_summary.json"],
-      "perturbation": "窗口 ∈ {3,5,7,14} 天均匀 vs 7 天加权 w=[0.3,0.2,0.15,0.12,0.1,0.08,0.05]",
-      "metric": "报告期总费用(元) @ q=80",
-      "threshold": "5/7/14 天窗口间总费用变化 < 5%",
-      "observed": {
-        "3天均匀": 20226034.85, "5天均匀": 17979113.74, "7天均匀": 16875313.78,
-        "7天加权(基准)": 17741097.14, "14天均匀": 17388171.48
-      },
-      "status": "CONDITIONAL",
-      "limitation": "预报窗口/加权为可调超参数：3 天窗口劣化 +14%，7/14 天窗口较基准 −2%~+0%；主结论(储能+风险修正显著降费)对窗口稳健，但绝对费用对预报调优有 ±2% 量级敏感",
-      "fallback_relevance": "不触发 fallback；预报加权可在后续作为超参数微调，不影响模型结构"
+    "argmin_total_quantile": 90,
+    "argmin_total": 14461289.17,
+    "baseline_q80_total": 14559104.58
+  },
+  "R2_window": {
+    "3天均匀": {
+      "total": 14598674.81,
+      "plan": 13089138.97,
+      "emg": 1509535.85,
+      "emg_energy": 386693.75,
+      "emg_intervals": 11534,
+      "emg_share": 0.103402
     },
-    {
-      "id": "R3",
-      "tested_claim": "充放电效率口径(HD2)不影响储能价值的定性结论",
-      "assumption": "η_c=η_d=0.9 单向(往返 0.81) vs 往返 0.9(单向 √0.9≈0.9487)",
-      "input_sources": ["data_clean/cleaned_data.pkl"],
-      "result_sources": ["robustness/Q2/q2_robustness_summary.json"],
-      "perturbation": "ETA_C=ETA_D ∈ {0.9, √0.9}",
-      "metric": "报告期总费用(元) @ q=80",
-      "threshold": "两口径下储能价值仍显著为正(>300 万元)",
-      "observed": {
-        "eta_single_0.9(往返0.81)": 17741097.14,
-        "eta_sqrt0.9(往返0.90)": 17203867.05,
-        "delta": -537230.09,
-        "delta_pct": -0.0303
-      },
-      "status": "PASS",
-      "limitation": "效率口径改变总费用约 −3.0%，但储能价值方向不变(无储能基线不受 η 影响，价值仍 >400 万元)；HD2 建议在论文中明确口径",
-      "fallback_relevance": "不触发"
+    "5天均匀": {
+      "total": 14589673.55,
+      "plan": 13009609.25,
+      "emg": 1580064.3,
+      "emg_energy": 403668.8,
+      "emg_intervals": 12023,
+      "emg_share": 0.1083
     },
-    {
-      "id": "R4",
-      "tested_claim": "费用随电价线性缩放，无放大/振荡",
-      "assumption": "电价 p_t 为外生常数",
-      "input_sources": ["data_clean/cleaned_data.pkl"],
-      "result_sources": ["robustness/Q2/q2_robustness_summary.json"],
-      "perturbation": "p_t × k, k ∈ {0.90, 0.95, 1.00, 1.05, 1.10}",
-      "metric": "报告期总费用(元) @ q=80",
-      "threshold": "费用/电价 = 常数(线性，偏差 < 0.5%)",
-      "observed": {
-        "x0.90": 15966987.43, "x0.95": 16854042.28, "x1.00": 17741097.14,
-        "x1.05": 18628152.00, "x1.10": 19515206.85,
-        "linear_exact": true
-      },
-      "status": "PASS",
-      "limitation": "LP 费用对电价精确线性，无敏感性风险",
-      "fallback_relevance": "不触发"
+    "7天均匀": {
+      "total": 14660223.93,
+      "plan": 12969445.14,
+      "emg": 1690778.79,
+      "emg_energy": 430646.62,
+      "emg_intervals": 12368,
+      "emg_share": 0.115331
     },
-    {
-      "id": "R5",
-      "tested_claim": "日末循环约束 S_144=S_0 对结果影响可忽略",
-      "assumption": "储能日末 SOC 约束",
-      "input_sources": ["data_clean/cleaned_data.pkl"],
-      "result_sources": ["robustness/Q2/q2_robustness_summary.json"],
-      "perturbation": "日末循环(S_144=S_0) vs 自由终态",
-      "metric": "报告期总费用(元) @ q=80",
-      "threshold": "差异 < 1%",
-      "observed": {
-        "daily_cycle_S144_eq_S0": 17741097.14,
-        "free_terminal": 17763825.96,
-        "delta": 22728.82,
-        "delta_pct": 0.00128
-      },
-      "status": "PASS",
-      "limitation": "日末循环约束仅使费用增加 0.13%，保证每日可重复运行，取舍合理",
-      "fallback_relevance": "不触发"
+    "7天加权(基准)": {
+      "total": 14559104.58,
+      "plan": 13008179.66,
+      "emg": 1550924.93,
+      "emg_energy": 396939.32,
+      "emg_intervals": 11977,
+      "emg_share": 0.106526
+    },
+    "14天均匀": {
+      "total": 15251373.61,
+      "plan": 13456071.69,
+      "emg": 1795301.92,
+      "emg_energy": 460029.56,
+      "emg_intervals": 11356,
+      "emg_share": 0.117714
     }
-  ],
-  "verdict": "CONDITIONAL",
-  "verdict_note": "五项定向检验中 R1/R3/R4/R5 为 PASS；R2(预报窗口)为 CONDITIONAL——模型结构稳健，但预报超参数存在 ±2% 量级的调优空间，属可接受的局限性而非方法缺陷。无需 fallback 或回退主模型。"
+  },
+  "R3_efficiency": {
+    "eta_single_0.9_roundtrip_0.81": {
+      "total": 14559104.58,
+      "plan": 13008179.66,
+      "emg": 1550924.93,
+      "emg_energy": 396939.32,
+      "emg_intervals": 11977,
+      "emg_share": 0.106526
+    },
+    "eta_sqrt0.9_roundtrip_0.90": {
+      "total": 14092449.45,
+      "plan": 12546377.91,
+      "emg": 1546071.54,
+      "emg_energy": 395229.81,
+      "emg_intervals": 11955,
+      "emg_share": 0.109709
+    }
+  },
+  "R4_price": {
+    "price_x0.90": {
+      "total": 13103273.13,
+      "plan": 11707361.69,
+      "emg": 1395911.44,
+      "emg_energy": 396989.69,
+      "emg_intervals": 11977,
+      "emg_share": 0.106532
+    },
+    "price_x0.95": {
+      "total": 13831263.52,
+      "plan": 12357770.68,
+      "emg": 1473492.85,
+      "emg_energy": 396996.49,
+      "emg_intervals": 11977,
+      "emg_share": 0.106533
+    },
+    "price_x1.00": {
+      "total": 14559104.58,
+      "plan": 13008179.66,
+      "emg": 1550924.93,
+      "emg_energy": 396939.32,
+      "emg_intervals": 11977,
+      "emg_share": 0.106526
+    },
+    "price_x1.05": {
+      "total": 15287059.81,
+      "plan": 13658588.64,
+      "emg": 1628471.17,
+      "emg_energy": 396939.32,
+      "emg_intervals": 11977,
+      "emg_share": 0.106526
+    },
+    "price_x1.10": {
+      "total": 16015015.04,
+      "plan": 14308997.62,
+      "emg": 1706017.42,
+      "emg_energy": 396939.32,
+      "emg_intervals": 11977,
+      "emg_share": 0.106526
+    }
+  },
+  "R5_terminal": {
+    "daily_cycle_S144_eq_S0": {
+      "total": 14559104.58,
+      "plan": 13008179.66,
+      "emg": 1550924.93,
+      "emg_energy": 396939.32,
+      "emg_intervals": 11977,
+      "emg_share": 0.106526
+    },
+    "free_terminal": {
+      "total": 14567758.84,
+      "plan": 13016833.92,
+      "emg": 1550924.93,
+      "emg_energy": 396939.32,
+      "emg_intervals": 11977,
+      "emg_share": 0.106463
+    }
+  },
+  "meta": {
+    "question_id": "Q2",
+    "model": "M2-daily-rolling-LP+self-forecast+risk-correction(q80,dow-bucketed)",
+    "seed": 2026,
+    "generated_at": "2026-09-11T21:15:47.780566",
+    "report_period": "2025-02-01 ~ 2025-12-31",
+    "data_source": "data_clean/cleaned_data.pkl"
+  }
 }

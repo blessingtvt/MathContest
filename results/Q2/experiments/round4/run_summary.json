@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "question_id": "Q2",
+  "experiment_id": "round4",
+  "method": "M2-daily-rolling-LP+netload-self-forecast+risk-correction(q80,dow-bucketed)",
+  "seed": 2026,
+  "status": "success",
+  "created_at": "2026-09-11T20:44:17.761132",
+  "data_sources": [
+    "data_clean/cleaned_data.pkl"
+  ],
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "warmup": "附件2历史(7天加权平均预报 + 历史误差分位, 仅用当日之前数据)",
+  "forecast": "净负荷 N=L-P, 7天加权平均 w=[0.3,0.2,0.15,0.12,0.1,0.08,0.05]; 历史误差 80 分位按星期分桶风险修正 e80[dow]",
+  "information_set_note": "附件3(光伏预报)属 Q3/Q4, 非 Q2; Q2 用附件2历史自预报",
+  "approved_decision_id": "q2_method_choice_r3",
+  "main": {
+    "method_id": "M2",
+    "objective_name": "报告期总购电费(元, 含计划+紧急)",
+    "objective_value": 14559104.58,
+    "plan_cost": 13008179.66,
+    "emergency_cost": 1550924.93,
+    "outputs": [
+      "results/Q2/result2.xlsx"
+    ]
+  },
+  "baselines": [
+    {
+      "id": "B2",
+      "name": "无储能(自预报+80分位)",
+      "objective_value": 18172127.42
+    },
+    {
+      "id": "B2_ref",
+      "name": "无储能(完美预见, 下界)",
+      "objective_value": 16407319.63
+    },
+    {
+      "id": "R2",
+      "name": "规则套利(自预报+80分位)",
+      "objective_value": 16572068.47
+    }
+  ],
+  "metrics": {
+    "储能价值_元": 3613022.84,
+    "储能价值_占比": 0.198822,
+    "优化价值_元": 2012963.89,
+    "预报误差成本_无储能": 1764807.79,
+    "紧急购电_区间数": 11977,
+    "紧急购电_电量kWh": 396939.32,
+    "紧急购电_占比": 0.020816,
+    "弃光_区间数": 36119,
+    "弃光_电量kWh": 2554948.04,
+    "弃光率": 0.133985,
+    "储电量_min": 1200.0,
+    "储电量_max": 10800.0
+  }
+}

@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """Q2 round3 论文图生成 (math-figure-generator)。
 
-生成 4 图（柔和高级感配色，多图表形式）:
+生成 5 图（柔和高级感配色，多图表形式）:
   fig_q2_1 风险分位敏感性 (面积图+折线)
   fig_q2_2 基线对比 (横向棒棒糖图)
   fig_q2_3 典型日调度策略 3.20 (面积图+柱状)
   fig_q2_4 月度费用构成 (堆叠柱状)
+  fig_q2_5 每日紧急购电 vs 净负荷/光伏 (季节性解释)
 
 输出目录: paper/figures/ (300 dpi PNG)
 """
 import os, sys
+from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import matplotlib
@@ -55,12 +57,16 @@ def make_forecast(N, w):
     return Nhat, N - Nhat
 
 
-def run_full_report(price, N, Nhat, Eerr, quantile=80.0):
+def run_full_report(price, N, Nhat, Eerr, quantile=80.0, full_dow=None):
     R = REPORT_DAYS
     Xr = np.zeros((R, T)); Cr = np.zeros((R, T)); Qr = np.zeros((R, T)); Zr = np.zeros((R, T))
     plan_day = np.zeros(R); emg_day = np.zeros(R)
     for i, d in enumerate(range(WARMUP_DAYS, N.shape[0])):
-        e_q = np.percentile(Eerr[7:d], quantile, axis=0) if d > 7 else np.zeros(T)
+        if full_dow is not None:
+            hist = Eerr[7:d]; hd = full_dow[7:d]; mask = hd == full_dow[d]
+            e_q = np.percentile(hist[mask], quantile, axis=0) if mask.sum() > 0 else np.zeros(T)
+        else:
+            e_q = np.percentile(Eerr[7:d], quantile, axis=0) if d > 7 else np.zeros(T)
         Nsafe = Nhat[d] + e_q
         _, x, c, q, Est = daily_lp(price, Nsafe, np.zeros(T), E0=E0_INIT,
                                    terminal_eq=True, E_term=E0_INIT)
@@ -78,22 +84,26 @@ def main():
     pv = b['附件2_pv']
     N = load - pv
     dates = report_dates(b)
+    full_dow = np.array([datetime.strptime(s, "%Y-%m-%d %H:%M:%S").weekday()
+                         for s in b['dates']])
     Nhat, Eerr = make_forecast(N, W)
 
-    Xr, Cr, Qr, Zr, plan_day, emg_day = run_full_report(price, N, Nhat, Eerr, 80.0)
+    Xr, Cr, Qr, Zr, plan_day, emg_day = run_full_report(price, N, Nhat, Eerr, 80.0, full_dow)
 
     # ---- fig 1: 风险分位敏感性（面积图 + 折线） ----
     qs = [0, 30, 50, 70, 80, 90, 95, 99]
-    totals = [57567252.07, 26403078.64, 20105495.72, 18223007.92,
-              17741097.14, 17793134.79, 18228658.05, 19503771.29]
-    shares = [92.76, 56.24, 32.09, 18.10, 11.28, 4.75, 2.31, 0.69]
+    totals = [25093998.32, 17575991.73, 15913613.91, 14870741.86,
+              14559104.58, 14461289.17, 14624319.15, 15197625.85]
+    shares = [60.16, 34.23, 24.04, 14.93, 10.65, 6.45, 4.36, 2.75]
     fig, ax1 = plt.subplots(figsize=(6.4, 4.2))
     ax1.fill_between(qs, totals, color=PALETTE['mist'], alpha=0.7, linewidth=0)
     ax1.plot(qs, totals, color=PALETTE['slate'], lw=2, marker='o', ms=4.5,
              markerfacecolor=PALETTE['slate'], label='报告期总费用（左轴）')
-    ax1.scatter([80], [17741097.14], s=120, color=PALETTE['rose_d'], zorder=5,
-                marker='*', label='最优 q*=80')
-    ax1.axvline(80, color=PALETTE['rose_d'], ls=':', lw=1.4, alpha=0.8)
+    ax1.scatter([90], [14461289.17], s=120, color=PALETTE['rose_d'], zorder=5,
+                marker='*', label='经验最优 q*=90')
+    ax1.axvline(80, color=PALETTE['slate'], ls=':', lw=1.4, alpha=0.8)
+    ax1.text(81, totals[0] * 0.86, '设计 q=80（报童）\n仅高 0.67%', fontsize=8,
+             color=PALETTE['slate'], ha='left')
     ax1.set_xlabel('风险分位 q（%）'); ax1.set_ylabel('总费用（元）', color=PALETTE['slate'])
     ax1.tick_params(axis='y', labelcolor=PALETTE['slate'])
     ax2 = ax1.twinx()
@@ -110,7 +120,7 @@ def main():
 
     # ---- fig 2: 基线对比（横向棒棒糖图） ----
     methods = ['B2_ref\n完美预见', 'M2\n主模型', 'R2\n规则套利', 'B2\n无储能']
-    vals = [16407319.63, 17741097.14, 19161505.44, 21337033.56]
+    vals = [16407319.63, 14559104.58, 16572068.47, 18172127.42]
     dots = [PALETTE['sky'], PALETTE['slate'], PALETTE['taupe'], PALETTE['gray']]
     ypos = np.arange(len(methods))[::-1]
     fig, ax = plt.subplots(figsize=(6.4, 4.0))
@@ -120,7 +130,7 @@ def main():
         ax.text(v + 250000, y, f'{v/1e6:.2f} M', va='center', fontsize=9, color=PALETTE['ink'])
     ax.set_yticks(ypos); ax.set_yticklabels(methods, fontsize=9)
     ax.set_xlabel('报告期总购电费（元）')
-    ax.set_xlim(0, 23500000)
+    ax.set_xlim(0, 19500000)
     ax.grid(axis='x', alpha=0.25, color=PALETTE['gray'])
     ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
     fig.tight_layout()
@@ -167,9 +177,81 @@ def main():
     fig.savefig(os.path.join(FIG_DIR, 'fig_q2_4_monthly_cost.png'), dpi=300)
     plt.close(fig)
 
+    # ---- fig 5: 每日紧急购电 vs 净负荷/光伏（季节性解释） ----
+    R = REPORT_DAYS
+    emg_energy_day = Zr.sum(axis=1)                            # 每日紧急购电量 kWh
+    netload_energy_day = (N[WARMUP_DAYS:].sum(axis=1)) * DT    # 每日净负荷电量 kWh
+    solar_energy_day = (pv[WARMUP_DAYS:].sum(axis=1)) * DT     # 每日光伏电量 kWh
+
+    def _idx(m, dd):
+        for i, dt in enumerate(dates):
+            if dt.month == m and dt.day == dd:
+                return i
+        return None
+    marks = [('春分', _idx(3, 20)), ('夏至', _idx(6, 21)),
+             ('秋分', _idx(9, 23)), ('冬至', _idx(12, 21))]
+
+    x = np.arange(R)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8.6, 5.8), sharex=True)
+    # 上：每日紧急购电量
+    ax1.bar(x, emg_energy_day, color=PALETTE['rose'], alpha=0.85, width=1.0)
+    ax1.set_ylabel('紧急购电量\n(kWh/日)', fontsize=9)
+    ax1.grid(alpha=0.25, color=PALETTE['gray'])
+    ymax1 = float(emg_energy_day.max())
+    ax1.set_ylim(0, ymax1 * 1.12)
+    # 下：每日净负荷电量（面积）+ 光伏电量（折线）
+    ax2.fill_between(x, netload_energy_day / 1e3, color=PALETTE['slate'], alpha=0.45,
+                     linewidth=0, label='净负荷电量')
+    ax2.plot(x, solar_energy_day / 1e3, color=PALETTE['sage'], lw=1.6, label='光伏电量')
+    ax2.set_ylabel('电量\n(MWh/日)', fontsize=9)
+    ax2.set_xlabel('日期')
+    ax2.grid(alpha=0.25, color=PALETTE['gray'])
+    ax2.legend(loc='upper right', fontsize=8, frameon=False)
+    # 月份刻度
+    month_starts = [0] + [i for i in range(1, R) if dates[i].month != dates[i - 1].month]
+    ax2.set_xticks(month_starts)
+    ax2.set_xticklabels([f'{dates[i].month}月' for i in month_starts], fontsize=8)
+    # 四个日期标记
+    for name, i in marks:
+        if i is None:
+            continue
+        ax1.axvline(i, color=PALETTE['ink'], ls=':', lw=0.9, alpha=0.55)
+        ax2.axvline(i, color=PALETTE['ink'], ls=':', lw=0.9, alpha=0.55)
+        ax1.text(i, ymax1 * 1.05, name, rotation=90, va='top', ha='center',
+                 fontsize=8, color=PALETTE['ink'])
+    # 季节解释注释
+    i_sum = marks[1][1]; i_win = marks[3][1]
+    if i_sum is not None:
+        ax1.annotate('夏至/梅雨：光伏波动大→误差大→6月紧急购电全年最高',
+                     xy=(i_sum, emg_energy_day[i_sum]),
+                     xytext=(i_sum - 80, ymax1 * 0.82),
+                     fontsize=8, color=PALETTE['rose_d'], ha='center',
+                     arrowprops=dict(arrowstyle='->', color=PALETTE['rose_d'], lw=1.0))
+    if i_win is not None:
+        ax1.annotate('冬至：冬季稳定→误差小→紧急购电最低（净负荷却最高）',
+                     xy=(i_win, emg_energy_day[i_win]),
+                     xytext=(i_win - 92, ymax1 * 0.45),
+                     fontsize=8, color=PALETTE['sage_d'], ha='center',
+                     arrowprops=dict(arrowstyle='->', color=PALETTE['sage_d'], lw=1.0))
+    fig.suptitle('紧急购电的季节性：由预报误差波动驱动（梅雨高、冬季低），非净负荷水平', fontsize=11, color=PALETTE['ink'])
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG_DIR, 'fig_q2_5_seasonal_emergency.png'), dpi=300)
+    plt.close(fig)
+
+    # 季节性统计摘要（用于解释）
+    emg_days_m, emg_energy_m = {}, {}
+    for i, d in enumerate(dates):
+        m = d.month
+        emg_days_m[m] = emg_days_m.get(m, 0) + (1 if emg_energy_day[i] > 1e-6 else 0)
+        emg_energy_m[m] = emg_energy_m.get(m, 0.0) + emg_energy_day[i]
+    print('每日紧急购电统计（月）：')
+    for m in sorted(emg_days_m):
+        print(f'  {m:>2}月：紧急购电天数 {emg_days_m[m]:>3}，紧急购电量 {emg_energy_m[m]:>10.0f} kWh')
+
     print('figures written to', FIG_DIR)
     for f in ['fig_q2_1_quantile_sensitivity.png', 'fig_q2_2_baseline_comparison.png',
-              'fig_q2_3_representative_day.png', 'fig_q2_4_monthly_cost.png']:
+              'fig_q2_3_representative_day.png', 'fig_q2_4_monthly_cost.png',
+              'fig_q2_5_seasonal_emergency.png']:
         p = os.path.join(FIG_DIR, f)
         print(' ', p, os.path.getsize(p), 'bytes')
 

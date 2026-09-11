@@ -4,7 +4,7 @@
 信息集(修正 2026-09-11): 附件3(光伏预报) 属于 Q3/Q4, Q2 只能用 附件1电价 + 附件2历史。
 每天 0:00 决策流程:
   1. 净负荷 N_d = L_d - P_d; 7 天加权平均自预报 N̂_d = Σ w_k N_{d-k};
-  2. 历史误差 80 分位 e^80 (仅用 d 之前数据, 因果), 安全净负荷 N^safe = N̂ + e^80;
+  2. 历史误差 80 分位 e^80 (按星期分桶 e80[dow], 仅用 d 之前同星期数据, 因果), 安全净负荷 N^safe = N̂ + e^80;
   3. 单日 LP(净负荷口径) 求当日计划购电 G、充/放电 C/D, 日末循环 S_144 = S_0 = 6000;
   4. 用当日真实净负荷结算, 缺口紧急购电 z(5 倍价)。
 
@@ -20,6 +20,23 @@ from common import *
 
 W = [0.3, 0.2, 0.15, 0.12, 0.1, 0.08, 0.05]
 QUANTILE = 80.0
+ROUND = "round4"          # round3=全局分位; round4=按星期分桶 e80[dow]
+
+
+def bundle_dow(bundle):
+    """365 天的星期索引 (0=周一..6=周日), 与 bundle['dates'] 对齐。"""
+    return np.array([datetime.strptime(s, "%Y-%m-%d %H:%M:%S").weekday()
+                     for s in bundle["dates"]])
+
+
+def error_quantile_dow(Eerr, full_dow, d, quantile=80.0):
+    """按星期分桶的历史误差 quantile 分位 (仅用 d 之前同星期数据, 因果)。"""
+    hist = Eerr[7:d]
+    hd = full_dow[7:d]
+    mask = hd == full_dow[d]
+    if mask.sum() == 0:
+        return np.zeros(Eerr.shape[1])
+    return np.percentile(hist[mask], quantile, axis=0)
 
 
 def netload_forecast(N):
@@ -59,13 +76,14 @@ def main():
     labels = time_labels()
     N = load - pv                       # 净负荷 (kW)
     Nhat, Eerr = netload_forecast(N)
+    full_dow = bundle_dow(b)            # 星期索引 (round4 按星期分桶)
 
     # ---- 主模型 M2: 逐日滚动 LP + 80 分位风险修正 (日末循环 S_144=S_0) ----
     R = REPORT_DAYS
     Xr = np.zeros((R, T)); Cr = np.zeros((R, T)); Qr = np.zeros((R, T)); Zr = np.zeros((R, T))
     E_seq = [E0_INIT]
     for i, d in enumerate(range(WARMUP_DAYS, D)):
-        e80 = np.percentile(Eerr[7:d], QUANTILE, axis=0) if d > 7 else np.zeros(T)
+        e80 = error_quantile_dow(Eerr, full_dow, d, QUANTILE)
         Nsafe = Nhat[d] + e80
         _, x_d, c_d, q_d, E_d = daily_lp(price, Nsafe, np.zeros(T), E0=E0_INIT,
                                          terminal_eq=True, E_term=E0_INIT)
@@ -83,7 +101,7 @@ def main():
     b_cost = b_ref_cost = r_cost = 0.0
     Erule = E0_INIT
     for d in range(WARMUP_DAYS, D):
-        e80 = np.percentile(Eerr[7:d], QUANTILE, axis=0) if d > 7 else np.zeros(T)
+        e80 = error_quantile_dow(Eerr, full_dow, d, QUANTILE)
         Nsafe = Nhat[d] + e80
         b_cost += no_storage_forecast(price, Nsafe, N[d])[0]
         b_ref_cost += no_storage(price, load[d], pv[d])[0]
@@ -103,7 +121,7 @@ def main():
 
     # ---- 写 result2.xlsx ----
     out_dir = os.path.join(RESULTS_DIR, "Q2")
-    os.makedirs(os.path.join(out_dir, "experiments", "round3"), exist_ok=True)
+    os.makedirs(os.path.join(out_dir, "experiments", ROUND), exist_ok=True)
     out_path = os.path.join(out_dir, "result2.xlsx")
     wb = openpyxl.load_workbook(os.path.join(TEMPLATE_DIR, "result2.xlsx"))
     fill_plan_grid(wb["计划购电量"], Xr)
@@ -115,15 +133,15 @@ def main():
     summary = {
         "schema_version": 1,
         "question_id": "Q2",
-        "experiment_id": "round3",
-        "method": "M2-daily-rolling-LP+netload-self-forecast+risk-correction(q80)",
+        "experiment_id": ROUND,
+        "method": "M2-daily-rolling-LP+netload-self-forecast+risk-correction(q80,dow-bucketed)",
         "seed": SEED,
         "status": "success",
         "created_at": datetime.now().isoformat(),
         "data_sources": ["data_clean/cleaned_data.pkl"],
         "report_period": "2025-02-01 ~ 2025-12-31",
         "warmup": "附件2历史(7天加权平均预报 + 历史误差分位, 仅用当日之前数据)",
-        "forecast": "净负荷 N=L-P, 7天加权平均 w=[0.3,0.2,0.15,0.12,0.1,0.08,0.05]; 历史误差 80 分位风险修正",
+        "forecast": "净负荷 N=L-P, 7天加权平均 w=[0.3,0.2,0.15,0.12,0.1,0.08,0.05]; 历史误差 80 分位按星期分桶风险修正 e80[dow]",
         "information_set_note": "附件3(光伏预报)属 Q3/Q4, 非 Q2; Q2 用附件2历史自预报",
         "approved_decision_id": "q2_method_choice_r3",
         "main": {
@@ -154,7 +172,7 @@ def main():
             "储电量_max": round(float(Er.max()), 2),
         },
     }
-    with open(os.path.join(out_dir, "experiments", "round3", "run_summary.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(out_dir, "experiments", ROUND, "run_summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
 
     print(json.dumps(summary, ensure_ascii=False, indent=2))
