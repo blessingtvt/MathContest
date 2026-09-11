@@ -2,8 +2,8 @@
   "schema_version": 1,
   "question_id": "Q3",
   "rigor_profile": "lean",
-  "current_gate": "G4",
-  "status": "results_frozen_waiting_human",
+  "current_gate": "G2",
+  "status": "method_reopened_waiting_human",
   "artifacts": {
     "parse": "planning/parse/problem_parse.json",
     "classification": "planning/classification/problem_classification.json",
@@ -19,9 +19,9 @@
     "latest_run": "results/Q3/experiments/round1/run_summary.json",
     "frozen_numbers": "results/Q3/reports/frozen_numbers.json"
   },
-  "allowed": { "code_generation": true, "freeze": true, "paper_writing": false, "final_assembly": false },
+  "allowed": { "code_generation": false, "freeze": false, "paper_writing": false, "final_assembly": false },
   "blockers": [],
-  "assumption_notes": "HD4(计费口径)/S8(预报粒度) 按默认提案应用（未显式 DECIDED），进入 G5 前建议确认",
-  "next_action": { "owner": "human", "skill": "workflow-orchestrator", "reason": "G4 冻结完成，待人类确认后进入 G5-G6 论文写作与三重审计" },
-  "updated_at": "2026-09-10T21:00:00+08:00"
+  "assumption_notes": "round1 冻结已解冻：储能末端短视缺陷(terminal_eq=False 每日倒空至1200、含储能反贵于无储能)，G2 重开修正终端约束。HD4(计费口径)/S8(预报粒度) 待人类确认。",
+  "next_action": { "owner": "human", "skill": "decision-prompt-builder", "reason": "G2 重开：待人类确认终端约束方案(A日闭合/B残值)与 HD4/S8 口径后，进入 G3 编码重跑" },
+  "updated_at": "2026-09-11T18:00:00+08:00"
 }

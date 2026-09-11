@@ -1,32 +1,35 @@
 {
   "schema_version": 1,
   "question_id": "Q3",
-  "generated_at": "2026-09-10T18:45:00+08:00",
+  "generated_at": "2026-09-11T18:00:00+08:00",
+  "round": "round2",
   "data_refs": ["data/data_report.md", "data/data_profile.json"],
+  "round1_note": "round1 冻结已解冻：储能末端短视缺陷（terminal_eq=False 每日倒空至 1200），含储能 16,972,663.03 元 > 无储能完美预见 16,407,319.63 元。本探针基于修正后框架（含储能终端约束）。",
   "methods": [
     {
       "id": "M3",
       "role": "main_candidate",
-      "name": "滚动时域线性规划（MPC：0:00计划 + 6/12/18调整 + 违约/溢价惩罚）",
-      "executability": {"status": "PASS", "evidence": {"note": "LP骨架已由Q1/Q2实测验证(577变量~10ms/次)；Q3分段计费线性化在G3实现后复核", "scale_estimate": "365×4=1460次LP≈14s"}},
-      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0, "note": "附件3预报(365×4×24)与附件2实际(365×144)全覆盖"}},
+      "name": "滚动时域线性规划（MPC：0:00计划 + 6/12/18调整 + 分段计费线性化 + 日闭合终端约束 E(144)=E(0)=6000）",
+      "executability": {"status": "PASS", "evidence": {"note": "LP骨架由Q1/Q2实测验证(577变量~10ms/次)；round1已实现MPC，仅需在 daily_lp/stage_lp 加 terminal_eq=True", "scale_estimate": "365×4=1460次LP≈14s"}},
+      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0, "note": "附件3预报(1460×24)与附件2实际(365×144)全覆盖"}},
       "assumption_checks": [
-        {"name": "penalty_linearization(HD4)", "status": "CONDITIONAL", "metric": "min/max分段计费", "value": "引入 w+=max(x−y,0), w−=max(y−x,0) 线性化", "note": "标准分段线性化可保LP；HD4口径待人类确认"},
-        {"name": "forecast_granularity(S8)", "status": "CONDITIONAL", "metric": "整点预报→10min", "value": "待确认插值/阶梯映射", "note": "数据粒度差异，非方法风险，但影响调整决策精度"},
-        {"name": "efficiency_direction(HD2)", "status": "CONDITIONAL", "metric": "eta=0.9单向", "value": "待确认"}
+        {"name": "penalty_linearization(HD4)", "status": "CONDITIONAL", "metric": "min/max分段计费", "value": "y=u+v, 0≤u≤x, v≥0; 目标 0.5p·u+1.5p·v", "note": "标准分段线性化可保LP；HD4同区间比较口径待人类确认"},
+        {"name": "forecast_granularity(S8)", "status": "CONDITIONAL", "metric": "整点预报→10min", "value": "阶梯映射(整点值覆盖其后6个10min区间)", "note": "数据粒度差异，影响调整决策精度，非方法风险"},
+        {"name": "efficiency_direction(HD2)", "status": "PASS", "metric": "eta=0.9单向", "value": "已由Q2确认单向0.9"},
+        {"name": "terminal_constraint(末端短视修复)", "status": "PASS", "metric": "E(144)=E(0)=6000", "value": "日闭合约束，消除round1倒空"}
       ],
-      "output_degeneracy": {"status": "CONDITIONAL", "metrics": {"note": "违约/溢价分段线性化后，x=y 区间计费系数拐点可能产生多重最优，需次优目标或按区间唯一化"}},
-      "perturbation_sensitivity": {"status": "PASS", "perturbation": "预报误差→费用", "metric": "待G3测", "value": "滚动重优化天然降低预报误差敏感性(文献#7/#8)"},
+      "output_degeneracy": {"status": "CONDITIONAL", "metrics": {"note": "违约/溢价分段线性化在 x=y 拐点处计费系数跳变，可能产生多重最优；加极小次优项或按 u*=min(y,x) 唯一化"}},
+      "perturbation_sensitivity": {"status": "CONDITIONAL", "perturbation": "预报误差→违约/溢价/紧急", "metric": "待G3测违约/溢价/紧急三段占比", "value": "滚动重优化天然降低预报误差敏感性(文献#7/#8)"},
       "scale_check": {"status": "PASS", "representative_n": "365天×4时刻", "variables_per_day": 577, "runtime_estimate_s": 14, "peak_memory_mb": "<50"},
       "verdict": "PASS",
-      "conditions": ["HD4计费口径确认后实现分段线性化；G3验证预报误差下的费用"],
-      "evidence_refs": ["code/scripts/risk_probe.py", "papers/related_paper_analysis.md"]
+      "conditions": ["HD4计费口径确认；S8预报粒度确认；G3重跑后复核含储能≤无储能下界"],
+      "evidence_refs": ["code/scripts/risk_probe.py", "methods/Q3/q3_reasonableness_analysis.md"]
     },
     {
       "id": "B3",
       "role": "usable_baseline",
-      "name": "仅0:00计划、不调整（Q2式静态 + 紧急购电兜底）",
-      "executability": {"status": "PASS", "evidence": {"note": "即Q2逐日LP，已实测可行"}},
+      "name": "仅0:00计划、不调整（Q2式静态 + 同日闭合约束 + 紧急购电兜底）",
+      "executability": {"status": "PASS", "evidence": {"note": "即Q2逐日LP(terminal_eq=True)，已实测可行"}},
       "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0}},
       "assumption_checks": [],
       "output_degeneracy": {"status": "PASS", "metrics": {"note": "唯一确定"}},
@@ -35,7 +38,49 @@
       "verdict": "PASS",
       "conditions": [],
       "evidence_refs": []
+    },
+    {
+      "id": "R3",
+      "role": "usable_baseline",
+      "name": "规则套利（峰谷贪心充放 + 缺口购电，滚动预报 + 同日闭合）",
+      "executability": {"status": "PASS", "evidence": {"note": "round1已实现 rule_mpc_day，仅需加终端约束"}},
+      "data_coverage": {"status": "PASS", "evidence": {"missing_rate": 0.0}},
+      "assumption_checks": [],
+      "output_degeneracy": {"status": "PASS", "metrics": {"note": "贪心确定"}},
+      "perturbation_sensitivity": {"status": "PASS", "perturbation": "预报误差→缺口购电", "metric": "费用高于M3", "value": "量化优化价值"},
+      "scale_check": {"status": "PASS", "runtime_s": 5.0},
+      "verdict": "PASS",
+      "conditions": [],
+      "evidence_refs": []
     }
   ],
-  "note": "主方案(带调整)与基线(不调整)的差异量化'调整策略'价值；另需回答'是否需引入更多预报时刻'的比较实验。"
+  "risk_summary_four_dimensions": {
+    "assumption_risk": {
+      "status": "CONDITIONAL",
+      "items": [
+        "HD4 计费口径（同区间比较 vs 叠加口径）直接决定违约/溢价费用绝对值，结构不变",
+        "S8 预报粒度（整点→10min 阶梯/插值）影响调整决策精度",
+        "HD2 效率方向已由 Q2 确认单向 0.9（消除一项）"
+      ]
+    },
+    "data_degradation_risk": {
+      "status": "PASS",
+      "items": [
+        "附件3 为整点(1h)预报，负载/光伏/电价为 10min 粒度，需映射（S8），非缺失/错误",
+        "附件3 全覆盖无缺失、无重复、无负值；夜间光伏=0 为正常"
+      ]
+    },
+    "perturbation_risk": {
+      "status": "CONDITIONAL",
+      "items": [
+        "预报误差通过滚动重优化降敏，但会转化为违约/溢价/紧急三段费用",
+        "需 G3 监控三段占比：紧急(5倍)为最贵风险，若占比过高需加强预报或启用 F3' 鲁棒"
+      ]
+    },
+    "scale_risk": {
+      "status": "PASS",
+      "items": ["365天×4时刻=1460次LP≈14s，峰值内存<50MB，无规模风险"]
+    }
+  },
+  "note": "主方案(带调整)与基线(不调整/规则)的差异量化'调整策略'价值；另需回答'是否需引入更多预报时刻'的比较实验。"
 }
