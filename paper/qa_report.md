@@ -2,6 +2,8 @@
 
 > 前置：本审计仅在"一致性审计"与"完整性审计"均通过后放行。二者本次均 **PASS**，故进入本审计。
 
+> ⚠️ **本报告对应 round3（2026-09-11 round4 采纳之前）。** round4 已将 80 分位改为按星期分桶 e80[dow]，`paper/sections/q2.md` 与 `frozen_numbers.json` 均已更新为 round4（主结果总费用 14,559,104.58 元、经验 argmin 移至 q=90、claim 数由 26 增至 40）。本文 §2.3"argmin=80 吻合"、§2.1"26 项 claim"、§3 G1（稳健性报告措辞）均为 round3 历史记录；round4 下 `q2_robustness_report.md` 已重生成、G1 所指措辞已修正。建议在 final_assembly 前按 round4 重跑本审计。
+
 ## 1. 放行前置核查
 
 | 前置审计 | 结果 | 路径 |

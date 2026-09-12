@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "question_id": "Q2",
+    "information_set": "history only, d日0:00, 因果无前瞻 (两模型一致)",
+    "comparison": "round4 确定性(固定分位余量) vs C 多场景随机规划(CVaR)",
+    "C_predictor": "blend25",
+    "C_rho": 0.2,
+    "C_beta": 0.9,
+    "seed": 2026
+  },
+  "round4_deterministic": {
+    "total": 14559104.584044848,
+    "plan": 13008179.65864095,
+    "emergency": 1550924.9254038974,
+    "daily_emergency_mean": 4643.487800610471,
+    "max_daily_emergency": 59224.312639810894,
+    "max_daily_total": 95304.88556267456,
+    "CVaR90_emergency": 18134.564784139846,
+    "CVaR95_emergency": 23452.520900318686,
+    "days_emergency_gt0": 334,
+    "days_emergency_gt1000": 289,
+    "days_emergency_gt5000": 92,
+    "days_emergency_gt10000": 34
+  },
+  "C_stochastic": {
+    "total": 14565811.290337972,
+    "plan": 13420805.785996865,
+    "emergency": 1145005.5043411055,
+    "daily_emergency_mean": 3428.1601926380404,
+    "max_daily_emergency": 55443.05853072002,
+    "max_daily_total": 91801.86029339345,
+    "CVaR90_emergency": 17705.45727555347,
+    "CVaR95_emergency": 24399.32908556416,
+    "days_emergency_gt0": 324,
+    "days_emergency_gt1000": 208,
+    "days_emergency_gt5000": 54,
+    "days_emergency_gt10000": 28
+  },
+  "delta_C_minus_B": {
+    "total": 6706.7063,
+    "plan": 412626.1274,
+    "emergency": -405919.4211,
+    "daily_emergency_mean": -1215.3276,
+    "max_daily_emergency": -3781.2541,
+    "max_daily_total": -3503.0253,
+    "CVaR90_emergency": -429.1075,
+    "CVaR95_emergency": 946.8082,
+    "days_emergency_gt0": -10,
+    "days_emergency_gt1000": -81,
+    "days_emergency_gt5000": -38,
+    "days_emergency_gt10000": -6
+  }
+}

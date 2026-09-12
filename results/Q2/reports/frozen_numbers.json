@@ -33,6 +33,19 @@
     {"claim_id": "q2_rob_R3_eta_delta_pct", "value": -0.032052, "unit": "无量纲", "source_file": "robustness/Q2/q2_robustness_summary.json", "source_locator": "$.R3_efficiency（eta_sqrt0.9 相对 eta_single0.9 的变化率）"},
     {"claim_id": "q2_rob_R5_free_terminal", "value": 14567758.84, "unit": "元", "source_file": "robustness/Q2/q2_robustness_summary.json", "source_locator": "$.R5_terminal.free_terminal.total"},
     {"claim_id": "q2_rob_R5_delta", "value": 8654.26, "unit": "元", "source_file": "robustness/Q2/q2_robustness_summary.json", "source_locator": "$.R5_terminal（free_terminal − daily_cycle）"},
-    {"claim_id": "q2_rob_R5_delta_pct", "value": 0.000594, "unit": "无量纲", "source_file": "robustness/Q2/q2_robustness_summary.json", "source_locator": "$.R5_terminal（free_terminal 相对 daily_cycle 变化率）"}
+    {"claim_id": "q2_rob_R5_delta_pct", "value": 0.000594, "unit": "无量纲", "source_file": "robustness/Q2/q2_robustness_summary.json", "source_locator": "$.R5_terminal（free_terminal 相对 daily_cycle 变化率）"},
+    {"claim_id": "q2_ext_C_total_cost", "value": 14565811.29, "unit": "元", "source_file": "results/Q2/experiments/optimization/causal_scenario_summary.json", "source_locator": "$.recommended.total"},
+    {"claim_id": "q2_ext_C_plan_cost", "value": 13420805.79, "unit": "元", "source_file": "results/Q2/experiments/optimization/causal_scenario_summary.json", "source_locator": "$.recommended.plan"},
+    {"claim_id": "q2_ext_C_emergency_cost", "value": 1145005.50, "unit": "元", "source_file": "results/Q2/experiments/optimization/causal_scenario_summary.json", "source_locator": "$.recommended.emergency"},
+    {"claim_id": "q2_ext_C_emergency_energy_kwh", "value": 293193.98, "unit": "kWh", "source_file": "results/Q2/experiments/optimization/causal_scenario_summary.json", "source_locator": "$.recommended.emergency_kwh"},
+    {"claim_id": "q2_ext_C_emergency_intervals", "value": 8290, "unit": "区间", "source_file": "results/Q2/experiments/optimization/causal_scenario_summary.json", "source_locator": "$.recommended.emergency_intervals"},
+    {"claim_id": "q2_ext_C_curtailment_rate", "value": 0.179154, "unit": "无量纲", "source_file": "results/Q2/experiments/optimization/causal_scenario_summary.json", "source_locator": "$.recommended.curtailment_rate"},
+    {"claim_id": "q2_ext_C_emg_share", "value": 0.078609, "unit": "无量纲", "source_file": "results/Q2/experiments/optimization/causal_scenario_summary.json", "source_locator": "$.recommended.emg_share"},
+    {"claim_id": "q2_ext_C_max_daily_emergency", "value": 55443.06, "unit": "元", "source_file": "results/Q2/experiments/optimization/c_risk_comparison.json", "source_locator": "$.C_stochastic.max_daily_emergency"},
+    {"claim_id": "q2_ext_C_CVaR90_emergency", "value": 17705.46, "unit": "元", "source_file": "results/Q2/experiments/optimization/c_risk_comparison.json", "source_locator": "$.C_stochastic.CVaR90_emergency"},
+    {"claim_id": "q2_ext_C_days_emg_gt5000", "value": 54, "unit": "日", "source_file": "results/Q2/experiments/optimization/c_risk_comparison.json", "source_locator": "$.C_stochastic.days_emergency_gt5000"},
+    {"claim_id": "q2_ext_B_max_daily_emergency", "value": 59224.31, "unit": "元", "source_file": "results/Q2/experiments/optimization/c_risk_comparison.json", "source_locator": "$.round4_deterministic.max_daily_emergency"},
+    {"claim_id": "q2_ext_B_CVaR90_emergency", "value": 18134.56, "unit": "元", "source_file": "results/Q2/experiments/optimization/c_risk_comparison.json", "source_locator": "$.round4_deterministic.CVaR90_emergency"},
+    {"claim_id": "q2_ext_B_days_emg_gt5000", "value": 92, "unit": "日", "source_file": "results/Q2/experiments/optimization/c_risk_comparison.json", "source_locator": "$.round4_deterministic.days_emergency_gt5000"}
   ]
 }

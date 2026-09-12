@@ -137,25 +137,36 @@ def main():
     fig.savefig(os.path.join(FIG_DIR, 'fig_q2_2_baseline_comparison.png'), dpi=300)
     plt.close(fig)
 
-    # ---- fig 3: 典型日 2025-03-20 调度策略（面积图 + 柱状） ----
+    # ---- fig 3: 典型日 2025-03-20 微网功率平衡与储能调度结果（面积图 + 柱状） ----
     d_star = 79          # 2025-03-20（第 79 天）
     i_star = d_star - WARMUP_DAYS
     tt = np.arange(T)
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(7.2, 6.0), sharex=True)
-    # 上：负载/光伏（面积 + 折线）
-    ax1.fill_between(tt, pv[d_star], color=PALETTE['sage'], alpha=0.55, linewidth=0, label='光伏 G')
-    ax1.plot(tt, load[d_star], color=PALETTE['rose_d'], lw=1.6, label='负载 L')
+    # 上：光伏出力 / 负荷需求 / 净负荷（面积 + 折线）
+    ax1.fill_between(tt, pv[d_star], color=PALETTE['sage'], alpha=0.55, linewidth=0, label='光伏出力 G')
+    ax1.plot(tt, load[d_star], color=PALETTE['rose_d'], lw=1.6, label='负荷需求 L')
     ax1.plot(tt, N[d_star], color=PALETTE['gray'], lw=1.1, ls=':', label='净负荷 N=L−G')
-    ax1.set_ylabel('功率（kW）'); ax1.legend(loc='upper right', fontsize=8, frameon=False)
+    ax1.set_ylabel('功率（kW）')
+    ax1.set_title('（a）光伏与负荷功率', fontsize=9, color=PALETTE['ink'])
+    ax1.legend(loc='upper right', fontsize=8, frameon=False)
     ax1.grid(alpha=0.25, color=PALETTE['gray'])
-    # 下：购电/充放电（柱状 + 折线）
-    ax2.bar(tt, Cr[i_star]/DT, color=PALETTE['sage_d'], alpha=0.8, width=1.0, label='充电 c/Δt')
-    ax2.bar(tt, -Qr[i_star]/DT, color=PALETTE['rose'], alpha=0.8, width=1.0, label='放电 −q/Δt')
-    ax2.plot(tt, Xr[i_star]/DT, color=PALETTE['slate'], lw=1.4, label='计划购电 x/Δt')
-    ax2.set_ylabel('调度功率（kW）'); ax2.set_xlabel('日内区间 t（10 分钟）')
+    ax1.tick_params(labelbottom=False)  # 横轴与下子图共享，仅下子图显示刻度
+    # 下：外部购电 / 储能充放电（柱状 + 折线）
+    # 注：为便于展示储能运行状态，将放电功率以负值形式表示（模型变量 q_t≥0 定义不变）。
+    ax2.bar(tt, Cr[i_star]/DT, color=PALETTE['sage_d'], alpha=0.8, width=1.0, label='储能充电 $c_t$')
+    ax2.bar(tt, -Qr[i_star]/DT, color=PALETTE['rose'], alpha=0.8, width=1.0, label='储能放电 $-q_t$')
+    ax2.plot(tt, Xr[i_star]/DT, color=PALETTE['slate'], lw=1.4, label='计划购电 $x_t$')
+    ax2.set_ylabel('调度功率（kW）')
+    ax2.set_xlabel('调度时段（10 min）')
+    ax2.set_title('（b）购电与储能充放电功率', fontsize=9, color=PALETTE['ink'])
+    # 横轴刻度：调度时段编号 → 对应时刻（一天 144 个时段，每时段 10 min）
+    ax2.set_xticks([0, 36, 72, 108, 143])
+    ax2.set_xticklabels(['00:00', '06:00', '12:00', '18:00', '23:50'])
     ax2.legend(loc='lower left', fontsize=8, frameon=False)
     ax2.grid(alpha=0.25, color=PALETTE['gray'])
-    fig.suptitle('典型日调度策略（2025-03-20）', fontsize=11, color=PALETTE['ink'])
+    ax2.text(0.02, 0.97, '注：为便于展示储能运行状态，将放电功率以负值形式表示',
+             transform=ax2.transAxes, fontsize=7.5, va='top', color=PALETTE['gray'])
+    fig.suptitle('典型日微网功率平衡与储能调度结果（2025-03-20）', fontsize=11, color=PALETTE['ink'])
     fig.tight_layout()
     fig.savefig(os.path.join(FIG_DIR, 'fig_q2_3_representative_day.png'), dpi=300)
     plt.close(fig)

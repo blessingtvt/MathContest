@@ -1,7 +1,7 @@
 # Q2 论文写作材料包（solution-package-builder）
 
 > 本包是 Q2 论文写作的单一来源。数值一律引用 `frozen_numbers.json`，禁止散落引用。
-> 冻结状态：**已确认 keep（round4：按星期分桶 80 分位）**。round3 数值作废。
+> 冻结状态：**已确认 keep（round4：按星期分桶 80 分位）**。round3 数值作废。round4 为唯一主模型；随机规划扩展（C）为纯新增的稳健性/对照章节，不改动主结果。
 
 ## 1. 最终方法（一句话）
 
@@ -39,6 +39,7 @@
 | 净负荷周周期(ACF) | `paper/figures/fig_q2_6_netload_acf.png` | 论文正式(3) |
 | 分桶前后对比 | `paper/figures/fig_q2_7_dow_bucket_effect.png` | 论文正式(3) |
 | 储能日充放 | `paper/figures/fig_q2_8_storage_daily.png` | 附录(4) |
+| 随机规划尾部风险 | `paper/figures/fig_q2_9_stochastic_risk.png` | 论文正式(3) |
 | 指定日期结果表 | `results/Q2/q2_answer_tables.md` | 论文正式(3) |
 | 主结果表 | `results/Q2/reports/frozen_numbers.json` | 论文正式(3) |
 
@@ -49,7 +50,27 @@
 - **局限**：预报窗口为 ±2% 可调超参数（R2 CONDITIONAL）；效率口径影响绝对费用 −3%（HD2）；风险修正为逐区间独立分位，未建模日内自相关。
 - **不适用**：Q3/Q4（需附件3 滚动预报与分段计费 β_pen/γ_pre）。
 
-## 5. 决策溯源
+## 5. 随机规划扩展（C，纯新增）
+
+> 定位：round4 主模型不变；C 作为"同一因果信息集下的显式不确定性建模 + CVaR 尾部风险约束"的**扩展对照**，写入稳健性/讨论章节。
+
+- 代码：`code/Q2/Q2new_methods/q2_causal_scenario.py`（多场景随机规划 + CVaR）、`code/Q2/Q2new_methods/q2_c_risk_compare.py`（B/C 尾部风险对照）。
+- 来源：`results/Q2/experiments/optimization/causal_scenario_summary.json`、`c_risk_comparison.json`。
+
+| claim_id | 值 | 单位 | 对照（B=round4） |
+|---|---|---|---|
+| q2_ext_C_total_cost | 14,565,811.29 | 元 | B 14,559,104.58（+0.046%） |
+| q2_ext_C_plan_cost | 13,420,805.79 | 元 | B 13,008,179.66 |
+| q2_ext_C_emergency_cost | 1,145,005.50 | 元 | B 1,550,924.93（−26.2%） |
+| q2_ext_C_emergency_energy_kwh | 293,193.98 | kWh | B 396,939.32 |
+| q2_ext_C_curtailment_rate | 0.179154（17.92%） | 无量纲 | B 13.40% |
+| q2_ext_C_max_daily_emergency | 55,443.06 | 元 | B 59,224.31（−6.4%） |
+| q2_ext_C_CVaR90_emergency | 17,705.46 | 元 | B 18,134.56（−2.4%） |
+| q2_ext_C_days_emg_gt5000 | 54 | 日 | B 92（−41%） |
+
+**诚实表述要点（务必写进论文）**：C 的"总费用相当"由 blend25 预报（weekday4 星期分量）驱动；随机规划 + CVaR 本身在此恒定价设定下不降低 total，而是把尾部风险部分转移为计划多购/弃光（弃光率 +4.5pp）。若 C 改用与 B 相同的 weighted7 预报（ρ=0.2），总费用升至 17.44M，显著劣于 B。故 C 是"扩展对照"而非"更优替代"。
+
+## 6. 决策溯源
 
 - `q2_method_choice_r3`：主模型选型（逐日滚动 LP + 自预报 + 80分位）。
 - `q2_information_set_r3`：信息集修正（附件3 属 Q3/Q4，Q2 用附件2历史）。

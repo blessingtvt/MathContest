@@ -3,6 +3,8 @@
 > 审计对象：`paper/sections/q2.md`（论文）
 > 比对基准：`results/Q2/reports/frozen_numbers.json`（冻结数值）、`planning/symbol_table.md`（符号表）、`paper/figures/`（图表）、`code/common.py` / `methods/Q2/q2_final_method_explanation.md`（参数与公式）。
 
+> ⚠️ **本快照对应 round3（2026-09-11 round4 采纳之前）。** round4 已将 80 分位改为按星期分桶 e80[dow]，`paper/sections/q2.md` 与 `frozen_numbers.json` 均已更新为 round4 数值（主结果总费用 14,559,104.58 元、储能价值 19.88% 等）。本文 §1 的数值表为 round3 历史记录，§5 的 F1/F2 亦针对 round3 稳健性报告；round4 下的最新一致状态见 `frozen_numbers.json` 与 `robustness/Q2/q2_robustness_report.md`（已按 round4 重生成）。建议在 final_assembly 前按 round4 重跑本审计。
+
 ## 1. 数值一致性（论文 ↔ frozen_numbers.json）
 
 结论：**论文中出现的每一个绝对结果数值均可在 frozen_numbers.json 中找到对应 claim，无一越界。**
