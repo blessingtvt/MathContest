@@ -1,47 +1,52 @@
 {
   "schema_version": 1,
   "question_id": "Q3",
-  "frozen_at": "2026-09-11T23:30:00+08:00",
-  "round": "round3",
-  "method": "M3-MPC+piecewise-billing+terminal-daily-cycle+issue-80pct-pv-risk-correction",
+  "frozen_at": "2026-09-12T17:01:06+08:00",
+  "round": "round4",
+  "method": "M3-MPC+piecewise-billing+terminal-daily-cycle+issue-by-block-80pct-pv-risk-correction",
   "seed": 2026,
   "period": "2025-02-01 ~ 2025-12-31",
   "data_sources": ["data_clean/cleaned_data.pkl (附件1电价/附件2负载光伏/附件3光伏预报)"],
   "objective": {
     "name": "报告期总购电费(元, 含计划/违约/溢价/紧急)",
     "unit": "元",
-    "value": 15081833.10
+    "value": 14049999.28
   },
   "cost_breakdown": {
-    "plan_cost_yuan": 12370352.13,
-    "penalty_cost_yuan": 1798546.56,
-    "emergency_cost_yuan": 912934.41
+    "plan_cost_yuan": 12208135.40,
+    "penalty_cost_yuan": 1277803.18,
+    "emergency_cost_yuan": 564060.69
   },
   "risk_correction": {
-    "axis": "issue(0/6/12/18)",
+    "axis": "issue(0/6/12/18) × execution-block(6h, 逐10min区间)",
     "quantile": 80.0,
     "min_hist_days": 7,
-    "formula": "Ghat_safe = clip0(Ghat - delta[issue]), delta[s] = P80(overestimate)",
-    "delta_issue_kW": [0.0, 1005.49, -6.27, 0.0]
+    "formula": "Ghat_safe[s,t] = clip0(Ghat[s,t] - delta[s,t]), delta[s,:]=P80(overestimate) 逐区间因果分位",
+    "delta_shape": "4×36 (per issue × per 10-min execution interval)",
+    "delta_issue_kW_scalar_round3": [0.0, 1005.49, -6.27, 0.0],
+    "full_matrix": "results/Q3/experiments/optimization/block_risk_summary.json (block_quantile 80.0)"
   },
   "baselines": [
-    {"id": "B3", "name": "静态不调整(日闭合+修正)", "objective_value": 17398559.68},
-    {"id": "R3", "name": "规则套利(日闭合+修正)", "objective_value": 17753485.91},
+    {"id": "B3", "name": "静态不调整(日闭合+块级修正)", "objective_value": 17291136.58},
+    {"id": "R3", "name": "规则套利(日闭合+块级修正)", "objective_value": 16956099.35},
     {"id": "B3_ref", "name": "无储能(完美预见,下界)", "objective_value": 16407319.63},
     {"id": "NS_fc", "name": "无储能+附件3预报(无修正)", "objective_value": 20128453.40}
   ],
   "metrics": {
-    "调整价值_元": 2316726.58,
-    "优化价值_元": 2671652.81,
-    "储能价值_元_vs无储能预报": 5046620.30,
-    "紧急购电_电量kWh": 245793.57,
-    "弃光_电量kWh": 2812018.61,
-    "弃光率": 0.147466,
+    "调整价值_元": 3241137.30,
+    "优化价值_元": 2906100.07,
+    "储能价值_元_vs无储能预报": 6078454.12,
+    "紧急购电_电量kWh": 145059.00,
+    "弃光_电量kWh": 1914415.30,
+    "弃光率": 0.100395,
+    "储电量_E_min": 1200.0,
+    "储电量_E_max": 10800.0,
     "储电量_E0_min": 6000.0,
     "储电量_E0_max": 6000.0,
     "储电量_E24_min": 6000.0,
     "储电量_E24_max": 6000.0,
-    "day_closure_verified": true
+    "day_closure_verified": true,
+    "storage_bounds_verified": true
   },
   "sensitivity": {
     "scheme_A_no_correction": {
@@ -49,21 +54,28 @@
       "emergency_cost": 4170246.79,
       "curtailment_kWh": 2103623.51
     },
-    "scheme_B_issue_80pct": {
-      "total_cost": 15081833.10,
-      "emergency_cost": 912934.41,
-      "curtailment_kWh": 2812018.61
+    "scheme_B_block_80pct": {
+      "total_cost": 14049999.28,
+      "emergency_cost": 564060.69,
+      "curtailment_kWh": 1914415.30
     },
-    "correction_value_yuan": 1888407.69,
+    "correction_value_yuan": 2920241.51,
+    "granularity_improvement": {
+      "scalar_q80_round3_total": 15081833.10,
+      "block_q80_round4_total": 14049999.28,
+      "delta_yuan": -1031833.82,
+      "delta_pct": -6.84
+    },
     "quantile_sweep_total": {
-      "q0": 40292445.97, "q50": 16475451.91, "q60": 15748617.22,
-      "q70": 15274877.01, "q80": 15081833.10, "q90": 15223234.82,
-      "q95": 15305807.28, "q100": 17342968.42
-    }
+      "q80": 14049999.28, "q82": 14032606.67, "q85": 14020104.48,
+      "q88": 14024754.51, "q90": 14040738.55, "q92": 14074381.31,
+      "q95": 14157721.87
+    },
+    "quantile_decision": "q80 冻结(理论锚定, 报童临界比 0.8); q85 为样本内 argmin, 目标在 [80,85] 平坦"
   },
-  "answer_tables": "results/Q3/q3_answer_tables.md",
-  "result_workbook": "results/Q3/result3.xlsx",
-  "robustness_report": "results/Q3/experiments/round3/robustness_report.json",
+  "answer_tables": "results/Q3/q3_answer_tables.md (round4 块级, G4 已重生成)",
+  "result_workbook": "results/Q3/result3.xlsx (round4 块级, G4 已重生成)",
+  "robustness_report": "results/Q3/experiments/round4/robustness_report.json (round4 块级)",
   "figure_plan": "methods/Q3/q3_figure_table_plan.md",
   "figures_dir": "paper/figures/",
   "paper_figures": [
@@ -73,7 +85,9 @@
     "paper/figures/fig_q3_4_stage_value.png",
     "paper/figures/fig_q3_5_quantile_sensitivity.png",
     "paper/figures/fig_q3_6_perturbation.png",
-    "paper/figures/fig_q3_7_horizon_error.png"
+    "paper/figures/fig_q3_7_horizon_error.png",
+    "paper/figures/fig_q3_8_delta_heatmap.png",
+    "paper/figures/fig_q3_9_soc_trajectory.png"
   ],
   "status": "frozen"
 }

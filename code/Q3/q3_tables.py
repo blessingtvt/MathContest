@@ -105,7 +105,7 @@ def main():
     L = []
     L.append("# Q3 指定日期结果表（表1 / 表2 / 表3）")
     L.append("")
-    L.append("> 数据来源：`results/Q3/result3.xlsx`（主模型 M3：滚动时域 MPC + 分段计费线性化 + 日闭合 E(144)=E(0)=6000 + 按 issue 分桶 80 分位光伏风险修正，round3）。")
+    L.append("> 数据来源：`results/Q3/result3.xlsx`（主模型 M3：滚动时域 MPC + 分段计费线性化 + 日闭合 E(144)=E(0)=6000 + 光伏风险修正按 issue×执行块 逐区间 80 分位，round4 块级）。")
     L.append("> 指定日期：2025.3.20（春分）、2025.6.21（夏至）、2025.9.23（秋分）、2025.12.21（冬至）。")
     L.append("> 单位：购电量 / 充电量 / 放电量 / 储电量均为 kWh，购电费为元。")
     L.append("")
@@ -168,7 +168,7 @@ def main():
     L.append("")
     L.append(f"> 注：紧急购电时段数——2025.3.20 为 {n_emg[0]} 个、2025.6.21 为 {n_emg[1]} 个、"
              f"2025.9.23 为 {n_emg[2]} 个、2025.12.21 为 {n_emg[3]} 个。"
-             "经按 issue 分桶 80 分位光伏风险修正后，6:00 高估缺口转成弃光，紧急购电显著低于未修正方案。")
+             "经按 issue×执行块 逐区间 80 分位光伏风险修正后，6:00 高估缺口转成弃光，紧急购电显著低于未修正方案。")
 
     out = os.path.join(RESULTS_DIR, "Q3", "q3_answer_tables.md")
     with open(out, "w", encoding="utf-8") as f:

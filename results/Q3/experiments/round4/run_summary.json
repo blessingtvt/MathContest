@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "experiment_id": "round4",
+  "method": "M3-MPC+piecewise-billing+terminal-daily-cycle+issue-by-block-80pct-pv-risk-correction",
+  "seed": 2026,
+  "status": "success",
+  "created_at": "2026-09-12T18:03:08.746515",
+  "report_period": "2025-02-01 ~ 2025-12-31",
+  "risk_correction": {
+    "axis": "issue(0/6/12/18) × execution-block(6h, 逐10min区间)",
+    "quantile": 80.0,
+    "min_hist_days": 7,
+    "formula": "Ghat_safe[s,t] = clip0(Ghat[s,t] - delta[s,t]), delta[s,:]=P80(overestimate) 逐区间因果分位"
+  },
+  "main": {
+    "method_id": "M3-block",
+    "objective_name": "报告期总购电费(元, 含违约/溢价/紧急)",
+    "objective_value": 14049999.28,
+    "plan_cost": 12208135.4,
+    "penalty_cost": 1277803.18,
+    "emergency_cost": 564060.69,
+    "outputs": [
+      "results/Q3/result3.xlsx"
+    ]
+  },
+  "metrics": {
+    "紧急购电_电量kWh": 145059.0,
+    "弃光_电量kWh": 1914415.3,
+    "弃光率": 0.100395,
+    "储电量_E0_min": 6000.0,
+    "储电量_E0_max": 6000.0,
+    "储电量_E24_min": 6000.0,
+    "储电量_E24_max": 6000.0
+  },
+  "cross_check_vs_frozen": {
+    "total": [
+      14049999.27672215,
+      14049999.28
+    ],
+    "plan": [
+      12208135.404701995,
+      12208135.4
+    ],
+    "penalty": [
+      1277803.1819057078,
+      1277803.18
+    ],
+    "emergency": [
+      564060.690114435,
+      564060.69
+    ],
+    "emg_kwh": [
+      145059.00319333337,
+      145059.0
+    ],
+    "curtail": [
+      1914415.298022223,
+      1914415.3
+    ]
+  },
+  "cross_check_ok": true
+}

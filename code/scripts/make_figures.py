@@ -32,10 +32,10 @@ rcParams["grid.linewidth"] = 0.4
 # 统一配色 (Okabe-Ito 色盲友好)
 C = {
     "load": "#6F78B9",       # 负载(需求): 绿色
-    "pv":   "#FED297",       # 光伏(供给): 淡黄
-    "grid": "#779FC6",       # 外网购电: 淡蓝
+    "pv":   "#FAE6D7",       # 光伏(供给): 米黄
+    "grid": "#F7C1C1",       # 外网购电: 粉色
     "chg":  "#009E73",       # 储能充电: 绿
-    "dis":  "#7FB3B0",       # 储能放电: 浅绿
+    "dis":  "#C7E0F5",       # 储能放电: 浅绿
     "bound":"#9E9E9E",       # 容量边界: 灰
     "E0":   "#6A3D9A",       # 初始储电量: 紫
     "price":"#404040",       # 电价: 深灰
@@ -71,7 +71,7 @@ def fig1_power_balance(price, load, pv, x, c, q):
                  alpha=0.88, edgecolor="none")
     # 需求: 负载线(绿) + 负载+充电线(绿虚线 = 供给堆顶)
     ax.plot(tP, load, color=C["load"], lw=2.8, label="负载 $L_t$ (kW)")
-    ax.plot(tP, load + c / DT, color=C["chg"], lw=1.5, ls="--",
+    ax.plot(tP, load + c / DT, color="#DE837D", lw=1.5, ls="--",
             label="负载+充电 $L_t+c_t/\\Delta t$ (kW)")
     _xticks(ax)
     ax.set_ylim(0, (load + c / DT).max() * 1.12)

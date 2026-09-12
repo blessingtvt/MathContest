@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "experiment_id": "round4",
+  "method": "block-level issue×execution-block risk correction",
+  "created_at": "2026-09-12T18:09:05.633924",
+  "seed": 2026,
+  "stage_ablation": {
+    "0": {
+      "stages": [
+        0
+      ],
+      "total": 17291136.58,
+      "emergency": 4692444.01,
+      "curtailment": 2358948.61
+    },
+    "0+6": {
+      "stages": [
+        0,
+        1
+      ],
+      "total": 14511749.8,
+      "emergency": 642911.49,
+      "curtailment": 2493300.1
+    },
+    "0+6+12": {
+      "stages": [
+        0,
+        1,
+        2
+      ],
+      "total": 14050000.56,
+      "emergency": 564060.73,
+      "curtailment": 1914417.72
+    },
+    "0+6+12+18": {
+      "stages": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "total": 14049999.28,
+      "emergency": 564060.69,
+      "curtailment": 1914415.3
+    }
+  },
+  "perfect_forecast_upper_bound": {
+    "total": 12245046.92,
+    "emergency": 0.0,
+    "curtailment": 986554.42,
+    "note": "4个调整时刻但用附件2实际光伏(完美预见), 为任何预报方案的下界"
+  },
+  "perturbation": {
+    "base": {
+      "total": 14049999.28,
+      "emergency": 564060.69,
+      "curtailment": 1914415.3
+    },
+    "load+5%": {
+      "total": 15323269.85,
+      "emergency": 569598.85,
+      "curtailment": 1800156.52
+    },
+    "load-5%": {
+      "total": 12800522.15,
+      "emergency": 548455.28,
+      "curtailment": 2052003.96
+    },
+    "pv+5%": {
+      "total": 13558109.22,
+      "emergency": 506749.69,
+      "curtailment": 2203159.48
+    },
+    "pv-5%": {
+      "total": 14692631.48,
+      "emergency": 635953.3,
+      "curtailment": 1717257.15
+    }
+  },
+  "horizon_error_p80_kW": {
+    "0": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.02,
+      -51.53,
+      -869.1,
+      -803.96,
+      -480.65,
+      -183.15,
+      363.63,
+      676.96,
+      1072.64,
+      1304.18,
+      1464.98,
+      1359.79,
+      1128.06,
+      648.13,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      null
+    ],
+    "1": [
+      -886.0,
+      -877.11,
+      -643.22,
+      -275.08,
+      131.79,
+      536.13,
+      892.79,
+      1205.48,
+      1352.28,
+      1308.69,
+      1070.56,
+      662.31,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "2": [
+      785.97,
+      1022.44,
+      1186.14,
+      1240.94,
+      1044.06,
+      668.1,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "3": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "quantile_sweep_total": {
+    "q0": 22498657.05,
+    "q50": 14845887.38,
+    "q60": 14483580.35,
+    "q70": 14218793.84,
+    "q80": 14049999.28,
+    "q82": 14032606.67,
+    "q85": 14020104.48,
+    "q88": 14024754.51,
+    "q90": 14040738.55,
+    "q92": 14074381.31,
+    "q95": 14157721.87,
+    "q100": 14951788.86
+  }
+}

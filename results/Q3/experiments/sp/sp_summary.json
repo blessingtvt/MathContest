@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "question_id": "Q3",
+  "method": "two-stage stochastic program (here-and-now 0:00 plan + 6/12/18 mean-value recourse + scenario emergency)",
+  "note": "阶段0 决策(计划x/c0/q0/E0)在场景间共享(非预见性); 6/12/18 调整用各 issue 预报(确定性 recourse); 紧急购电 z 用场景实际光伏结算。场景由历史(<d) 0:00 预报误差块 bootstrap 生成(因果, 无前瞻)。",
+  "seed": 2026,
+  "n_scenarios": 50,
+  "period": "2025-02-01 ~ 2025-12-31",
+  "results": {
+    "sp_out_of_sample_cost": 13791763.20,
+    "sp_in_sample_rp": 13833708.88,
+    "ws_perfect_foresight_with_storage": 12245046.92,
+    "block_baseline_q80": 14049999.28
+  },
+  "information_metrics": {
+    "RP_yuan": 13833708.88,
+    "RP_note": "here-and-now 随机规划样本内期望费用",
+    "WS_yuan": 12245046.92,
+    "WS_note": "wait-and-see 完美预见(含储能)上界",
+    "EVPI_yuan": 1588661.96,
+    "EVPI_note": "RP - WS (价值完美信息; RP 为样本内期望, WS 为完美预见含储能实际结算上界)",
+    "benefit_vs_deterministic_baseline_yuan": 258236.08,
+    "benefit_vs_deterministic_baseline_note": "block_baseline_q80 - SP_out_of_sample, 即「相较确定性基线策略(区间修正顺序法 q=80)的收益」=25.82万元. 注: 不使用 VSS 术语, 因教科书 VSS=EEV-RP 需先按标准定义重算 EEV(均值场景确定性解在随机场景下的期望), 而此处 258,236.08 是滚动基线 vs SP 的差值, 语义不同"
+  },
+  "vs_block_baseline": {
+    "delta_yuan": -258236.08,
+    "delta_pct": -1.84
+  },
+  "n_sensitivity": {
+    "N20": {"sp_real": 13823384.97, "rp_exp": 13805348.81, "delta_vs_block": -226614.31},
+    "N30": {"sp_real": 13807396.87, "rp_exp": 13816345.27, "delta_vs_block": -242602.41},
+    "N50": {"sp_real": 13791763.20, "rp_exp": 13833708.88, "delta_vs_block": -258236.08},
+    "N80": {"sp_real": 13786794.34, "rp_exp": 13843100.38, "delta_vs_block": -263204.94}
+  },
+  "limitation": "6/12/18 recourse 为均值(确定性)recourse, 未按场景实现的光伏逐阶段反应(真多阶段 = 场景相关 recourse + 非预见性)。此为后续可选增强。",
+  "status": "candidate (not frozen)"
+}
