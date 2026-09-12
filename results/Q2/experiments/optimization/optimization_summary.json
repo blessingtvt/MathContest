@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "question_id": "Q2",
+    "model": "M2 + curtailment penalty / dynamic risk",
+    "report_period": "2025-02-01 ~ 2025-12-31",
+    "seed": 2026
+  },
+  "curtailment_penalty": {
+    "0.0": {
+      "total": 17741097.14,
+      "plan": 15739922.23,
+      "emergency": 2001174.91,
+      "emergency_kwh": 493945.0,
+      "emergency_intervals": 10842,
+      "curtailment_kwh": 6406246.78,
+      "curtailment_intervals": 37254,
+      "curtailment_rate": 0.335953,
+      "emg_share": 0.112799,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "0.01": {
+      "total": 17745736.46,
+      "plan": 15739922.23,
+      "emergency": 2005814.22,
+      "emergency_kwh": 494891.06,
+      "emergency_intervals": 10854,
+      "curtailment_kwh": 6404891.61,
+      "curtailment_intervals": 37242,
+      "curtailment_rate": 0.335882,
+      "emg_share": 0.113031,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "0.05": {
+      "total": 17745736.46,
+      "plan": 15739922.23,
+      "emergency": 2005814.22,
+      "emergency_kwh": 494891.06,
+      "emergency_intervals": 10854,
+      "curtailment_kwh": 6404891.61,
+      "curtailment_intervals": 37242,
+      "curtailment_rate": 0.335882,
+      "emg_share": 0.113031,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "0.1": {
+      "total": 17745736.46,
+      "plan": 15739922.23,
+      "emergency": 2005814.22,
+      "emergency_kwh": 494891.06,
+      "emergency_intervals": 10854,
+      "curtailment_kwh": 6404891.61,
+      "curtailment_intervals": 37242,
+      "curtailment_rate": 0.335882,
+      "emg_share": 0.113031,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "0.5": {
+      "total": 17745736.46,
+      "plan": 15739922.23,
+      "emergency": 2005814.22,
+      "emergency_kwh": 494891.06,
+      "emergency_intervals": 10854,
+      "curtailment_kwh": 6404891.61,
+      "curtailment_intervals": 37242,
+      "curtailment_rate": 0.335882,
+      "emg_share": 0.113031,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "1.0": {
+      "total": 17745736.46,
+      "plan": 15739922.23,
+      "emergency": 2005814.22,
+      "emergency_kwh": 494891.06,
+      "emergency_intervals": 10854,
+      "curtailment_kwh": 6404891.61,
+      "curtailment_intervals": 37242,
+      "curtailment_rate": 0.335882,
+      "emg_share": 0.113031,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    }
+  },
+  "dynamic_risk": {
+    "fixed_q70": {
+      "total": 18223007.92,
+      "plan": 14925513.5,
+      "emergency": 3297494.42,
+      "emergency_kwh": 814779.27,
+      "emergency_intervals": 15621,
+      "curtailment_kwh": 5565503.68,
+      "curtailment_intervals": 32475,
+      "curtailment_rate": 0.291863,
+      "emg_share": 0.180952,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "fixed_q80": {
+      "total": 17741097.14,
+      "plan": 15739922.23,
+      "emergency": 2001174.91,
+      "emergency_kwh": 493945.0,
+      "emergency_intervals": 10842,
+      "curtailment_kwh": 6406246.78,
+      "curtailment_intervals": 37254,
+      "curtailment_rate": 0.335953,
+      "emg_share": 0.112799,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "fixed_q90": {
+      "total": 17793134.79,
+      "plan": 16948141.79,
+      "emergency": 844993.0,
+      "emergency_kwh": 213914.14,
+      "emergency_intervals": 5747,
+      "curtailment_kwh": 7774543.28,
+      "curtailment_intervals": 42349,
+      "curtailment_rate": 0.407708,
+      "emg_share": 0.04749,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "monthly_q80": {
+      "total": 18249850.73,
+      "plan": 15845199.99,
+      "emergency": 2404650.73,
+      "emergency_kwh": 595298.43,
+      "emergency_intervals": 10802,
+      "curtailment_kwh": 6623282.63,
+      "curtailment_intervals": 37294,
+      "curtailment_rate": 0.347334,
+      "emg_share": 0.131763,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    },
+    "seasonal_q80": {
+      "total": 17873530.69,
+      "plan": 15945363.52,
+      "emergency": 1928167.17,
+      "emergency_kwh": 477263.56,
+      "emergency_intervals": 10177,
+      "curtailment_kwh": 6682620.98,
+      "curtailment_intervals": 37919,
+      "curtailment_rate": 0.350446,
+      "emg_share": 0.107878,
+      "E_min": 1200.0,
+      "E_max": 10800.0
+    }
+  }
+}

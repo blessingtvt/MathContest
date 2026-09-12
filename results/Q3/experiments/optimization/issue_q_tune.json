@@ -1,0 +1,110 @@
+{
+  "70905050": {
+    "total": 14552586.09,
+    "plan": 11960728.26,
+    "penalty": 1500330.85,
+    "emergency": 1091526.98,
+    "emergency_kwh": 272796.6,
+    "emergency_intervals": 8372,
+    "curtailment_kwh": 1823498.62,
+    "curtailment_rate": 0.095627,
+    "E_min": 6000.0,
+    "E_max": 6000.0,
+    "q": [
+      70,
+      90,
+      50,
+      50
+    ]
+  },
+  "80908050": {
+    "total": 14105732.73,
+    "plan": 12215109.23,
+    "penalty": 1443942.51,
+    "emergency": 446680.98,
+    "emergency_kwh": 114677.7,
+    "emergency_intervals": 5308,
+    "curtailment_kwh": 2064874.91,
+    "curtailment_rate": 0.108285,
+    "E_min": 6000.0,
+    "E_max": 6000.0,
+    "q": [
+      80,
+      90,
+      80,
+      50
+    ]
+  },
+  "80908550": {
+    "total": 14080397.67,
+    "plan": 12258734.38,
+    "penalty": 1446765.79,
+    "emergency": 374897.49,
+    "emergency_kwh": 97428.61,
+    "emergency_intervals": 4740,
+    "curtailment_kwh": 2130069.91,
+    "curtailment_rate": 0.111704,
+    "E_min": 6000.0,
+    "E_max": 6000.0,
+    "q": [
+      80,
+      90,
+      85,
+      50
+    ]
+  },
+  "85908550": {
+    "total": 14073115.33,
+    "plan": 12261368.98,
+    "penalty": 1446893.8,
+    "emergency": 364852.55,
+    "emergency_kwh": 92912.97,
+    "emergency_intervals": 4657,
+    "curtailment_kwh": 2131719.6,
+    "curtailment_rate": 0.11179,
+    "E_min": 6000.0,
+    "E_max": 6000.0,
+    "q": [
+      85,
+      90,
+      85,
+      50
+    ]
+  },
+  "85909050": {
+    "total": 14070426.99,
+    "plan": 12306889.45,
+    "penalty": 1458114.23,
+    "emergency": 305423.32,
+    "emergency_kwh": 78163.14,
+    "emergency_intervals": 4066,
+    "curtailment_kwh": 2213634.14,
+    "curtailment_rate": 0.116086,
+    "E_min": 6000.0,
+    "E_max": 6000.0,
+    "q": [
+      85,
+      90,
+      90,
+      50
+    ]
+  },
+  "85908570": {
+    "total": 14050086.58,
+    "plan": 12272515.23,
+    "penalty": 1441325.76,
+    "emergency": 336245.58,
+    "emergency_kwh": 88347.52,
+    "emergency_intervals": 4142,
+    "curtailment_kwh": 2136163.08,
+    "curtailment_rate": 0.112023,
+    "E_min": 6000.0,
+    "E_max": 6000.0,
+    "q": [
+      85,
+      90,
+      85,
+      70
+    ]
+  }
+}

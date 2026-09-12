@@ -1,0 +1,62 @@
+{
+  "blend25": {
+    "total": 14565811.29,
+    "plan": 13420805.79,
+    "emergency": 1145005.5,
+    "emergency_kwh": 293193.98,
+    "emergency_intervals": 8290,
+    "curtailment_kwh": 3416275.42,
+    "curtailment_intervals": 39806,
+    "curtailment_rate": 0.179154,
+    "emg_share": 0.078609,
+    "E_min": 1200.0,
+    "E_max": 10800.0,
+    "predictor": "blend25",
+    "rho": 0.0
+  },
+  "blend50": {
+    "total": 14697042.8,
+    "plan": 13374070.57,
+    "emergency": 1322972.23,
+    "emergency_kwh": 338058.33,
+    "emergency_intervals": 8844,
+    "curtailment_kwh": 3378609.79,
+    "curtailment_intervals": 39252,
+    "curtailment_rate": 0.177179,
+    "emg_share": 0.090016,
+    "E_min": 1200.0,
+    "E_max": 10800.0,
+    "predictor": "blend50",
+    "rho": 0.0
+  },
+  "blend75": {
+    "total": 14915197.46,
+    "plan": 13379608.03,
+    "emergency": 1535589.43,
+    "emergency_kwh": 392050.3,
+    "emergency_intervals": 9312,
+    "curtailment_kwh": 3414009.27,
+    "curtailment_intervals": 38784,
+    "curtailment_rate": 0.179036,
+    "emg_share": 0.102955,
+    "E_min": 1200.0,
+    "E_max": 10800.0,
+    "predictor": "blend75",
+    "rho": 0.0
+  },
+  "weekday4": {
+    "total": 15216429.24,
+    "plan": 13459968.49,
+    "emergency": 1756460.74,
+    "emergency_kwh": 448137.0,
+    "emergency_intervals": 9677,
+    "curtailment_kwh": 3557664.76,
+    "curtailment_intervals": 38419,
+    "curtailment_rate": 0.186569,
+    "emg_share": 0.115432,
+    "E_min": 1200.0,
+    "E_max": 10800.0,
+    "predictor": "weekday4",
+    "rho": 0.0
+  }
+}
