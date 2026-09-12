@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Q4 主模型 M4 (round2) —— 波动电价下完全继承 Q2/Q3 最终模型。
+"""Q4 主模型 M4 (round3, 块级δ) —— 波动电价下完全继承 Q2/Q3 最终模型。
 
 result4-2 (对应 Q2): 逐日滚动 LP + 附件2历史净负荷自预报(7天加权) + 按星期分桶80分位风险修正
                     + 日闭合 E(144)=E(0)=6000, 电价 p_t → p_{d,t}。
 result4-3 (对应 Q3): 滚动 MPC(0:00计划+6/12/18调整) + 分段计费 + 日闭合
-                    + 按 issue 分桶80分位光伏风险修正 δ=[0,1005.49,-6.27,0], 电价 p_t → p_{d,t}。
+                    + issue×执行块 逐区间80分位光伏风险修正 δ(4,36), 电价 p_t → p_{d,t}。
 基线: B4 无储能(自预报+星期80分位) / R4 规则套利(自预报+星期80分位) / B4_ref 无储能完美预见(诊断下界)。
 
 输出: results/Q4/result4-2.xlsx, result4-3.xlsx + experiments/round2/run_summary.json
@@ -17,7 +17,7 @@ import numpy as np
 import openpyxl
 from common import *
 
-ROUND = "round2"
+ROUND = "round3"
 QUANTILE = 80.0
 MIN_HIST = 7
 W = [0.3, 0.2, 0.15, 0.12, 0.1, 0.08, 0.05]
@@ -66,6 +66,54 @@ def rule_forecast_day(price, Nsafe, Nreal, E_carry):
     return cost, x, c, q, Est[-1], z
 
 
+def block_delta(over, d, quantile=80.0, min_hist=7):
+    """issue×执行块 逐区间 分位修正 (4,36)，因果(仅用 [min_hist, d) 历史)，与 q3_optimized.py 一致。"""
+    hist = over[min_hist:d]
+    if len(hist) == 0:
+        return np.zeros((4, 36))
+    qv = np.asarray(quantile if np.ndim(quantile) else [quantile] * 4, dtype=float)
+    return np.stack([np.percentile(hist[:, s, :], qv[s], axis=0) for s in range(4)])
+
+
+def corrected_forecast_block(fc, d, s, delta):
+    """块级修正：只对 issue s 实际执行的 6h 块 [36s, 36s+36) 减去 delta[s](36 向量)。"""
+    g = forecast_intervals(fc, d, s).copy()
+    start = 36 * s
+    g[start:start + 36] = clip0(g[start:start + 36] - delta[s])
+    return g
+
+
+def q3_mpc_day_block(price, load_d, pv_actual, fc, d, E_carry, delta):
+    """Q3 单日滚动 MPC（块级 δ，delta 形状 (4,36)）。返回 (cost, x, y, c, q, E_end, z, E_day)。"""
+    g0 = corrected_forecast_block(fc, d, 0, delta)
+    _, x, c0, q0, E0t = daily_lp(price, load_d, g0, E0=E_carry, terminal_eq=True, E_term=E0_INIT)
+    g1 = corrected_forecast_block(fc, d, 1, delta); sl = 36
+    _, y1, c1, q1, E1t = stage_lp(price[sl:], load_d[sl:], g1[sl:], x[sl:], E0t[sl], terminal_eq=True, E_term=E0_INIT)
+    g2 = corrected_forecast_block(fc, d, 2, delta); sl = 72
+    _, y2, c2, q2, E2t = stage_lp(price[sl:], load_d[sl:], g2[sl:], x[sl:], E1t[sl - 36], terminal_eq=True, E_term=E0_INIT)
+    g3 = corrected_forecast_block(fc, d, 3, delta); sl = 108
+    _, y3, c3, q3, E3t = stage_lp(price[sl:], load_d[sl:], g3[sl:], x[sl:], E2t[sl - 72], terminal_eq=True, E_term=E0_INIT)
+    y = np.concatenate([x[:36], y1[:36], y2[:36], y3[:36]])
+    c = np.concatenate([c0[:36], c1[:36], c2[:36], c3[:36]])
+    qv = np.concatenate([q0[:36], q1[:36], q2[:36], q3[:36]])
+    z = clip0(load_d * DT + c - y - pv_actual * DT - qv)
+    bill = price * (np.minimum(x, y) + BETA_PEN * np.maximum(x - y, 0.0) + GAMMA_PRE * np.maximum(y - x, 0.0))
+    E_day = np.concatenate([E0t[:37], E1t[1:37], E2t[1:37], E3t[1:37]])
+    return float(bill.sum() + ALPHA_EM * (price * z).sum()), x, y, c, qv, E3t[-1], z, E_day
+
+
+def fill_daily_summary(ws, Qgrid, daily_cost):
+    """填充 全天购电量(第146列, kWh) 与 全天购电费(第147列, 元)。
+
+    表格模板在 144 个 10min 区间列(2..145)之后预留两列汇总：
+    - 第146列 全天购电量 = Σ_t Qgrid[d,t]（该 sheet 的全天购电总量）
+    - 第147列 全天购电费 = 该天实际总购电费用（含紧急购电；result4-3 含分段计费）
+    """
+    for d in range(REPORT_DAYS):
+        ws.cell(row=2 + d, column=146, value=float(Qgrid[d].sum()))
+        ws.cell(row=2 + d, column=147, value=float(daily_cost[d]))
+
+
 def main():
     b = load_bundle()
     load = b["附件2_load"]
@@ -100,40 +148,51 @@ def main():
     emg42 = float(ALPHA_EM * (price_d[WARMUP_DAYS:] * Zr).sum())
     cost42 = plan42 + emg42
 
+    cost42_daily = (price_d[WARMUP_DAYS:] * Xr).sum(axis=1) \
+        + ALPHA_EM * (price_d[WARMUP_DAYS:] * Zr).sum(axis=1)
+
     wb = openpyxl.load_workbook(os.path.join(TEMPLATE_DIR, "result4-2.xlsx"))
     fill_plan_grid(wb["计划购电量"], Xr)
+    fill_daily_summary(wb["计划购电量"], Xr, cost42_daily)
     rebuild_charge_sheet(wb["充放电量"], dates, Cr, Qr, Er)
     rebuild_emergency_sheet(wb["紧急购电量"], dates, Zr, labels)
     wb.save(os.path.join(out_dir, "result4-2.xlsx"))
 
-    # ============ result4-3: Q3 模型 + 波动电价 ============
+    # ============ result4-3: Q3 模型(块级 δ) + 波动电价 ============
     X3 = np.zeros((R, T)); Y3 = np.zeros((R, T)); C3 = np.zeros((R, T))
     Q3 = np.zeros((R, T)); Z3 = np.zeros((R, T))
     E0_arr = np.zeros(R); E24_arr = np.zeros(R)
+    E3_seq = [E0_INIT]
     E = E0_INIT
     row = 0
     for d in range(D):
-        delta = issue_risk_delta(over, d, QUANTILE, MIN_HIST)
+        delta = block_delta(over, d, QUANTILE, MIN_HIST)
         E_start = E
-        cost_d, x, yf, cf, qf, E_end, z = q3_mpc_day(price_d[d], load[d], pv[d], fc, d, E, delta)
+        cost_d, x, yf, cf, qf, E_end, z, E_day = q3_mpc_day_block(price_d[d], load[d], pv[d], fc, d, E, delta)
         E = E_end
         if d >= WARMUP_DAYS:
             E0_arr[row] = E_start; E24_arr[row] = E_end
             X3[row], Y3[row], C3[row], Q3[row], Z3[row] = x, yf, cf, qf, z
+            E3_seq.extend(E_day[1:].tolist())
             row += 1
+    E3_flat = np.array(E3_seq)             # 长度 R*T+1, 真实储能轨迹
     plan43 = float((price_d[WARMUP_DAYS:] * np.minimum(X3, Y3)).sum())
     pen43 = float((price_d[WARMUP_DAYS:] * (BETA_PEN * np.maximum(X3 - Y3, 0.0)
                                             + GAMMA_PRE * np.maximum(Y3 - X3, 0.0))).sum())
     emg43 = float(ALPHA_EM * (price_d[WARMUP_DAYS:] * Z3).sum())
     cost43 = plan43 + pen43 + emg43
 
-    E_flat = np.zeros(R * T + 1)
-    for d in range(R):
-        E_flat[d * T] = E0_arr[d]; E_flat[d * T + T] = E24_arr[d]
+    cost43_daily = (price_d[WARMUP_DAYS:] * np.minimum(X3, Y3)).sum(axis=1) \
+        + (price_d[WARMUP_DAYS:] * (BETA_PEN * np.maximum(X3 - Y3, 0.0)
+                                    + GAMMA_PRE * np.maximum(Y3 - X3, 0.0))).sum(axis=1) \
+        + ALPHA_EM * (price_d[WARMUP_DAYS:] * Z3).sum(axis=1)
+
     wb = openpyxl.load_workbook(os.path.join(TEMPLATE_DIR, "result4-3.xlsx"))
     fill_plan_grid(wb["计划购电量"], X3)
     fill_plan_grid(wb["调整购电量"], Y3)
-    rebuild_charge_sheet(wb["充放电量"], dates, C3, Q3, E_flat)
+    fill_daily_summary(wb["计划购电量"], X3, cost43_daily)
+    fill_daily_summary(wb["调整购电量"], Y3, cost43_daily)
+    rebuild_charge_sheet(wb["充放电量"], dates, C3, Q3, E3_flat)
     rebuild_emergency_sheet(wb["紧急购电量"], dates, Z3, labels)
     wb.save(os.path.join(out_dir, "result4-3.xlsx"))
 
@@ -221,6 +280,8 @@ def main():
                 "紧急购电_电量kWh": round(emg_energy43, 2),
                 "弃光_电量kWh": round(curt43, 2),
                 "弃光率": round(curt43 / pv_report, 6),
+                "储电量_min": round(float(E3_flat.min()), 2),
+                "储电量_max": round(float(E3_flat.max()), 2),
                 "储电量_E0_min": round(float(E0_arr.min()), 2),
                 "储电量_E0_max": round(float(E0_arr.max()), 2),
                 "储电量_E24_min": round(float(E24_arr.min()), 2),

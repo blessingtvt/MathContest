@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "experiment_id": "E4-2",
+  "purpose": "星期效应/跨日套利价值 = 日闭合约束成本（放开日闭合能省多少钱）",
+  "created_at": "2026-09-12T20:46:45.241501",
+  "seed": 2026,
+  "perfect_foresight": {
+    "A_day_closure": 12830486.39,
+    "B_free_carryover": 12780883.29,
+    "day_closure_cost": 49603.1,
+    "day_closure_cost_wan": 4.96,
+    "note": "完美预见极限下 result4-3(MPC+分段计费) ≡ result4-2(单计划 x=y)，故此日闭合约束成本对两个模型通用",
+    "crossday_boundary_throughput_kwh": 940400.56,
+    "weekday_mean_carryout_24h_kwh": {
+      "周一": 4404.16,
+      "周二": 4409.98,
+      "周三": 4520.05,
+      "周四": 1465.3,
+      "周五": 3660.66,
+      "周六": 9376.44,
+      "周日": 4649.4
+    },
+    "weekday_carryout_deviation_from_6000_kwh": {
+      "周一": -1595.84,
+      "周二": -1590.02,
+      "周三": -1479.95,
+      "周四": -4534.7,
+      "周五": -2339.34,
+      "周六": 3376.44,
+      "周日": -1350.6
+    }
+  },
+  "operational": {
+    "result4_2_day_closure": 15231785.59,
+    "result4_2_free_carryover": 15241873.7,
+    "result4_2_free_minus_closure": 10088.11,
+    "result4_3_day_closure": 14694112.99,
+    "result4_3_free_carryover": 14705242.3,
+    "result4_3_free_minus_closure": 11129.31,
+    "note": "可执行层逐日滚动只有单日前瞻，免费结转令储能每日末抽干至 EMIN、次日空仓起步，反而更贵 → 日闭合是逐日滚动模型的有益正则，而非额外成本。真正的跨日套利价值只能在完美预见(多日前瞻)层级度量，见 perfect_foresight。"
+  },
+  "status": "PASS",
+  "verdict": "跨日套利价值 ≈ 4.96 万元/年，相对报告期总购电费(≈1500万)可忽略(<0.35%)；故日闭合口径(Q2/Q3/Q4 一致)既保证可比，又几乎不损失经济性。"
+}

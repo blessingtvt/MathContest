@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3205259-df34-4b4b-bb26-7142e951bb0d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/make_figures.py" beforeDir="false" afterPath="$PROJECT_DIR$/make_figures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/Q3/reports/freeze_change_log.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q3/reports/freeze_change_log.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../results/Q3/reports/frozen_numbers.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../results/Q3/reports/frozen_numbers.json" afterDir="false" />
-    </list>
+    <list default="true" id="c3205259-df34-4b4b-bb26-7142e951bb0d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -72,7 +67,7 @@
       <workItem from="1789055076783" duration="1910000" />
       <workItem from="1789116692533" duration="8941000" />
       <workItem from="1789189954695" duration="597000" />
-      <workItem from="1789205298682" duration="2448000" />
+      <workItem from="1789205298682" duration="3135000" />
     </task>
     <servers />
   </component>

@@ -18,8 +18,9 @@ plt.rcParams["axes.unicode_minus"] = False
 plt.rcParams["svg.fonttype"] = "none"
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-RUN = os.path.join(ROOT, "results", "Q4", "experiments", "round2", "run_summary.json")
+RUN = os.path.join(ROOT, "results", "Q4", "experiments", "round3", "run_summary.json")
 ROB = os.path.join(ROOT, "robustness", "Q4", "q4_robustness_summary.json")
+E44 = os.path.join(ROOT, "results", "Q4", "experiments", "optimization", "e44_quantile_sweep.json")
 FIGDIR = os.path.join(ROOT, "paper", "figures")
 
 P = {
@@ -34,7 +35,8 @@ WAN = 1e4  # 万元
 def load():
     run = json.load(open(RUN, encoding="utf-8"))
     rob = json.load(open(ROB, encoding="utf-8"))
-    return run, rob
+    e44 = json.load(open(E44, encoding="utf-8"))
+    return run, rob, e44
 
 
 def style_ax(ax):
@@ -118,22 +120,34 @@ def fig2(run):
     return fig
 
 
-def fig3(rob):
-    """风险分位 q 灵敏度曲线。"""
+def fig3(rob, e44):
+    """风险分位 q 灵敏度曲线: result4-2 (R1 星期分位) + result4-3 (E4-4 块级)。"""
     r1 = rob["R1_quantile_sweep"]
-    q42 = r1["result4_2_total_by_q"]; q43 = r1["result4_3_total_by_q"]
-    qs = sorted(int(k) for k in q42)
-    v42 = [q42[str(q)] / WAN for q in qs]
-    v43 = [q43[str(q)] / WAN for q in qs]
+    q42 = r1["result4_2_total_by_q"]
+    # result4-2: 丢弃 q=0 退化点(无风险修正 → 26.16M 离群), 聚焦 q>=50 的近优区
+    qs42 = sorted(int(k) for k in q42 if int(k) >= 50)
+    v42 = [q42[str(q)] / WAN for q in qs42]
+    # result4-3: 块级 issue×执行块 分位修正 (E4-4, q ∈ {80,82,85,88,90,92,95})
+    sweep = e44["q_sweep"]
+    qs43 = sorted(int(k) for k in sweep)
+    v43 = [sweep[str(q)]["total"] / WAN for q in qs43]
 
     fig, ax = plt.subplots(figsize=(7.2, 4.6))
-    ax.plot(qs, v42, color=P["primary"], linewidth=2, marker="o", markersize=5, label="result4-2 (星期分位修正)")
-    ax.plot(qs, v43, color=P["accent1"], linewidth=2, marker="s", markersize=5, label="result4-3 (issue分位修正)")
+    ax.plot(qs42, v42, color=P["primary"], linewidth=2, marker="o", markersize=5,
+            label="result4-2 (星期分位修正)")
+    ax.plot(qs43, v43, color=P["accent1"], linewidth=2, marker="s", markersize=5,
+            label="result4-3 (块级分位修正)")
     ax.axvline(x=80, color="#999999", linestyle="--", linewidth=1)
-    ax.text(80.5, ax.get_ylim()[0], "q=80 (设计值)", fontsize=8, color="#606060", va="bottom")
+    ax.axvline(x=e44["argmin_q"], color=P["accent1"], linestyle=":", linewidth=1)
+    ymin, ymax = ax.get_ylim()
+    ax.text(80.6, ymin + 0.03 * (ymax - ymin), "q=80\n(设计值)", fontsize=8,
+            color="#606060", va="bottom")
+    ax.text(e44["argmin_q"] + 0.4, ymin + 0.03 * (ymax - ymin),
+            f"q={e44['argmin_q']}\n(result4-3 argmin)", fontsize=8,
+            color=P["accent1"], va="bottom")
     ax.set_xlabel("风险修正分位 q (%)", fontsize=10)
     ax.set_ylabel("报告期总购电费 (万元)", fontsize=10)
-    ax.set_title("风险分位 q 灵敏度：q=80 近最优", fontsize=11, fontweight="bold")
+    ax.set_title("风险分位 q 灵敏度：q=80 设计值近最优", fontsize=11, fontweight="bold")
     ax.legend(fontsize=9, frameon=False, loc="center right")
     style_ax(ax)
     fig.tight_layout()
@@ -149,10 +163,10 @@ def save(fig, name):
 
 def main():
     os.makedirs(FIGDIR, exist_ok=True)
-    run, rob = load()
+    run, rob, e44 = load()
     save(fig1(run), "fig_q4_1_cost_comparison")
     save(fig2(run), "fig_q4_2_cost_decomposition")
-    save(fig3(rob), "fig_q4_3_quantile_sensitivity")
+    save(fig3(rob, e44), "fig_q4_3_quantile_sensitivity")
     print("done")
 
 

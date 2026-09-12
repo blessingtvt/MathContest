@@ -8,7 +8,7 @@
 |---|---|---|---|---|---|---|
 | fig_q4_1_cost_comparison | **Type 3 论文** | run_summary.json（5 组方案） | 主模型 M4 显著低于双基线；诊断下界 B < A < M4 < B4_ref < B4 单调有序 | 5 组竖向柱状（万元） | 结果·方案对比 | 已生成、渲染通过 |
 | fig_q4_2_cost_decomposition | **Type 3 论文** | run_summary.json metrics | 预报误差是相对理论最优的**唯一主要**附加成本（240.1万），日闭合约束成本可忽略（5.0万） | 瀑布图（万元） | 结果·成本拆解 | 已生成、渲染通过 |
-| fig_q4_3_quantile_sensitivity | **Type 3 论文** | q4_robustness_summary.json R1 | q=80 设计值近最优（result4-2 偏离 0.69%、result4-3 恰最优） | 双曲线 q-成本（万元） | 稳健性·分位敏感性 | 已生成、渲染通过 |
+| fig_q4_3_quantile_sensitivity | **Type 3 论文** | R1（result4-2）+ E4-4 块级 e44_quantile_sweep.json（result4-3） | q=80 设计值近最优（result4-2 偏离 argmin q=90 共 0.69%、result4-3 偏离 argmin q=85 共 0.18%） | 双曲线 q-成本（万元） | 稳健性·分位敏感性 | 已生成、渲染通过 |
 
 - 无 Type 1 诊断图、无 Type 4 附录图（当前无需要补充的附录证据）。
 - 恒定 vs 波动对比用**表格**表达（精确值优于图），见下表。
@@ -20,7 +20,7 @@
 | tab_q4_cost_5group | 5 组方案总购电费（B/A/M4/B4_ref/B4） | frozen_numbers.json | 结果·方案对比 |
 | tab_q4_decomposition | 成本分解（B + 日闭合 + 预报误差 = M4） | frozen_numbers.json | 结果·成本拆解 |
 | tab_q4_const_vs_fluct | 恒定 vs 波动电价 6 项指标对比 | frozen_numbers.json（q4_result4_2_constant 等） | 结果·电价波动影响 |
-| tab_q4_q_sweep | q 扫描各分位总成本 | q4_robustness_summary.json R1 | 稳健性·分位敏感性 |
+| tab_q4_q_sweep | q 扫描各分位总成本 | result4-2: R1；result4-3: E4-4 块级 e44_quantile_sweep.json | 稳健性·分位敏感性 |
 
 ## 核心论断 → 视觉映射（验证）
 

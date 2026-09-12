@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "experiment_id": "E4-4",
+  "purpose": "result4-3 块级修正分位重扫（波动电价），确认 q=80 是否仍近优",
+  "created_at": "2026-09-12T20:14:49.364104",
+  "seed": 2026,
+  "q_sweep": {
+    "80": {
+      "total": 14694112.99,
+      "plan": 12758457.67,
+      "penalty": 1363165.14,
+      "emergency": 572490.18,
+      "emergency_kwh": 145152.63
+    },
+    "82": {
+      "total": 14677635.66,
+      "plan": 12780772.46,
+      "penalty": 1392419.08,
+      "emergency": 504444.12,
+      "emergency_kwh": 128401.2
+    },
+    "85": {
+      "total": 14667083.32,
+      "plan": 12813386.81,
+      "penalty": 1443326.88,
+      "emergency": 410369.63,
+      "emergency_kwh": 105090.75
+    },
+    "88": {
+      "total": 14675044.68,
+      "plan": 12847936.61,
+      "penalty": 1502629.5,
+      "emergency": 324478.57,
+      "emergency_kwh": 83336.78
+    },
+    "90": {
+      "total": 14693467.32,
+      "plan": 12871913.65,
+      "penalty": 1551084.11,
+      "emergency": 270469.55,
+      "emergency_kwh": 69503.18
+    },
+    "92": {
+      "total": 14730424.26,
+      "plan": 12898086.91,
+      "penalty": 1614176.72,
+      "emergency": 218160.63,
+      "emergency_kwh": 55976.75
+    },
+    "95": {
+      "total": 14820429.16,
+      "plan": 12940651.57,
+      "penalty": 1734610.4,
+      "emergency": 145167.19,
+      "emergency_kwh": 37239.24
+    }
+  },
+  "argmin_q": 85,
+  "q80_total": 14694112.99,
+  "q80_vs_argmin_delta": 27029.67,
+  "q80_delta_pct": 0.1839,
+  "status": "PASS",
+  "note": "q=80 相对 argmin 代价 <1% 则 q=80 仍近优（设计稳健）；Q3 恒定电价下 argmin=q85（14,020,104.48）"
+}

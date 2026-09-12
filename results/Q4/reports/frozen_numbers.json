@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "question_id": "Q4",
-  "frozen_at": "2026-09-12T02:36:41+08:00",
+  "frozen_at": "2026-09-12T20:30:43+08:00",
   "frozen_by_skill": "solution-package-builder",
   "decision_id": "q4_package_signoff",
   "signoff_status": "confirmed_keep",
-  "round": "round2",
+  "round": "round3",
   "seed": 2026,
   "method": "M4-inherit-Q2/Q3-final+fluctuating-price",
-  "note": "波动电价(附件4)下完全继承 Q2(round4)/Q3(round3) 最终模型仅换电价。完美预见(A/B/B4_ref)为诊断基准, 非可执行策略。论文全部数值必须引用本文件, 严禁手工编辑。冻结后若规范源变更, 须走 thaw→rerun→refreeze 并记 freeze_change_log.md。",
+  "note": "波动电价(附件4)下完全继承 Q2(round4)/Q3(round4 块级) 最终模型仅换电价。Q3 光伏风险修正采用 issue×执行块 逐区间 80 分位(块级 δ, 4×36)，q=80 为报童临界比 (5-1)/5=0.8 冻结主值；样本内经验 argmin q=85 仅作敏感性参照。完美预见(A/B/B4_ref)为诊断基准, 非可执行策略。论文全部数值必须引用本文件, 严禁手工编辑。冻结后若规范源变更, 须走 thaw→rerun→refreeze 并记 freeze_change_log.md。",
   "numbers": [
     {
       "claim_id": "q4_result4_2_total_cost",
@@ -33,30 +33,30 @@
     },
     {
       "claim_id": "q4_result4_3_total_cost",
-      "value": 15759231.74,
+      "value": 14694112.99,
       "unit": "元",
-      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
       "source_locator": "$.result4_3.objective_value"
     },
     {
       "claim_id": "q4_result4_3_plan_cost",
-      "value": 12929399.19,
+      "value": 12758457.67,
       "unit": "元",
-      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
       "source_locator": "$.result4_3.plan_cost"
     },
     {
       "claim_id": "q4_result4_3_penalty_cost",
-      "value": 1909943.19,
+      "value": 1363165.14,
       "unit": "元",
-      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
       "source_locator": "$.result4_3.penalty_cost"
     },
     {
       "claim_id": "q4_result4_3_emergency_cost",
-      "value": 919889.36,
+      "value": 572490.18,
       "unit": "元",
-      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
       "source_locator": "$.result4_3.emergency_cost"
     },
     {
@@ -152,16 +152,16 @@
     },
     {
       "claim_id": "q4_emergency_energy_43",
-      "value": 245553.35,
+      "value": 145152.63,
       "unit": "kWh",
-      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
       "source_locator": "$.metrics.result4_3.紧急购电_电量kWh"
     },
     {
       "claim_id": "q4_curtailment_rate_43",
-      "value": 0.147977,
+      "value": 0.100414,
       "unit": "无量纲",
-      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round2\\run_summary.json",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
       "source_locator": "$.metrics.result4_3.弃光率"
     },
     {
@@ -173,10 +173,10 @@
     },
     {
       "claim_id": "q4_quantile_argmin_43",
-      "value": 80,
+      "value": 85,
       "unit": "分位(%)",
-      "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
-      "source_locator": "$.R1_quantile_sweep.argmin_q_result4_3"
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\optimization\\e44_quantile_sweep.json",
+      "source_locator": "$.argmin_q"
     },
     {
       "claim_id": "q4_quantile_q80_delta_42",
@@ -261,6 +261,48 @@
       "unit": "元",
       "source_file": "D:\\MathContest\\C题\\robustness\\Q4\\q4_robustness_summary.json",
       "source_locator": "$.R3_constant_vs_fluctuating.day_closure_cost_constant"
+    },
+    {
+      "claim_id": "q4_curtailment_energy_43",
+      "value": 1914784.21,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
+      "source_locator": "$.metrics.result4_3.弃光_电量kWh"
+    },
+    {
+      "claim_id": "q4_storage_min_43",
+      "value": 1200.0,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
+      "source_locator": "$.metrics.result4_3.储电量_min"
+    },
+    {
+      "claim_id": "q4_storage_max_43",
+      "value": 10800.0,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
+      "source_locator": "$.metrics.result4_3.储电量_max"
+    },
+    {
+      "claim_id": "q4_quantile_q80_delta_43",
+      "value": 27029.67,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\optimization\\e44_quantile_sweep.json",
+      "source_locator": "$.q80_vs_argmin_delta"
+    },
+    {
+      "claim_id": "q4_result4_3_constant",
+      "value": 14049999.28,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q3\\reports\\frozen_numbers.json",
+      "source_locator": "$.objective.value"
+    },
+    {
+      "claim_id": "q4_result4_3_fluctuating",
+      "value": 14694112.99,
+      "unit": "元",
+      "source_file": "D:\\MathContest\\C题\\results\\Q4\\experiments\\round3\\run_summary.json",
+      "source_locator": "$.result4_3.objective_value"
     }
   ]
 }
