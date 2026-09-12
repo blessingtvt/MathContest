@@ -3,12 +3,24 @@
   "question_id": "Q2",
   "experiment_id": "round3",
   "seed": 2026,
-  "created_at": "2026-09-11T12:45:00+08:00",
+  "created_at": "2026-09-12T05:31:14.568370",
   "report_period": "2025-02-01 ~ 2025-12-31",
   "forecast": "净负荷 7天加权平均 + 80分位风险修正",
   "baselines": [
-    {"id": "B2", "name": "无储能(自预报+80分位)", "objective_value": 21337033.56},
-    {"id": "B2_ref", "name": "无储能(完美预见, 下界)", "objective_value": 16407319.63},
-    {"id": "R2", "name": "规则套利(自预报+80分位)", "objective_value": 19161505.44}
+    {
+      "id": "B2",
+      "name": "无储能(自预报+80分位)",
+      "objective_value": 21337033.56
+    },
+    {
+      "id": "B2_ref",
+      "name": "无储能(完美预见, 下界)",
+      "objective_value": 16407319.63
+    },
+    {
+      "id": "R2",
+      "name": "规则套利(自预报+80分位)",
+      "objective_value": 19161505.44
+    }
   ]
 }
