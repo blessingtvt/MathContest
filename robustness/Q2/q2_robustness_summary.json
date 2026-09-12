@@ -2,199 +2,199 @@
   "R1_quantile": {
     "sweep": {
       "0": {
-        "total": 25093998.32,
-        "plan": 9998224.83,
-        "emg": 15095773.5,
-        "emg_energy": 3893566.46,
-        "emg_intervals": 41728,
-        "emg_share": 0.601569
+        "total": 57567252.07,
+        "plan": 4169445.38,
+        "emg": 53397806.69,
+        "emg_energy": 12721823.65,
+        "emg_intervals": 41143,
+        "emg_share": 0.927573
       },
       "30": {
-        "total": 17575991.73,
-        "plan": 11559250.39,
-        "emg": 6016741.35,
-        "emg_energy": 1553224.27,
-        "emg_intervals": 31973,
-        "emg_share": 0.342327
+        "total": 26403078.64,
+        "plan": 11555258.52,
+        "emg": 14847820.11,
+        "emg_energy": 3759050.52,
+        "emg_intervals": 32254,
+        "emg_share": 0.562352
       },
       "50": {
-        "total": 15913613.91,
-        "plan": 12088716.09,
-        "emg": 3824897.83,
-        "emg_energy": 986345.76,
-        "emg_intervals": 24339,
-        "emg_share": 0.240354
+        "total": 20105495.72,
+        "plan": 13654192.2,
+        "emg": 6451303.53,
+        "emg_energy": 1623562.49,
+        "emg_intervals": 24476,
+        "emg_share": 0.320873
       },
       "70": {
-        "total": 14870741.86,
-        "plan": 12650871.8,
-        "emg": 2219870.05,
-        "emg_energy": 569192.75,
-        "emg_intervals": 16200,
-        "emg_share": 0.149278
+        "total": 18223007.92,
+        "plan": 14925513.5,
+        "emg": 3297494.42,
+        "emg_energy": 814779.27,
+        "emg_intervals": 15621,
+        "emg_share": 0.180952
       },
       "80": {
-        "total": 14559104.58,
-        "plan": 13008179.66,
-        "emg": 1550924.93,
-        "emg_energy": 396939.32,
-        "emg_intervals": 11977,
-        "emg_share": 0.106526
+        "total": 17741097.14,
+        "plan": 15739922.23,
+        "emg": 2001174.91,
+        "emg_energy": 493945.0,
+        "emg_intervals": 10842,
+        "emg_share": 0.112799
       },
       "90": {
-        "total": 14461289.17,
-        "plan": 13528799.4,
-        "emg": 932489.77,
-        "emg_energy": 238152.84,
-        "emg_intervals": 7506,
-        "emg_share": 0.064482
+        "total": 17793134.79,
+        "plan": 16948141.79,
+        "emg": 844993.0,
+        "emg_energy": 213914.14,
+        "emg_intervals": 5747,
+        "emg_share": 0.04749
       },
       "95": {
-        "total": 14624319.15,
-        "plan": 13986562.37,
-        "emg": 637756.78,
-        "emg_energy": 162660.19,
-        "emg_intervals": 5220,
-        "emg_share": 0.043609
+        "total": 18228658.05,
+        "plan": 17807760.3,
+        "emg": 420897.75,
+        "emg_energy": 107631.22,
+        "emg_intervals": 3196,
+        "emg_share": 0.02309
       },
       "99": {
-        "total": 15197625.85,
-        "plan": 14780409.06,
-        "emg": 417216.79,
-        "emg_energy": 106723.9,
-        "emg_intervals": 3403,
-        "emg_share": 0.027453
+        "total": 19503771.29,
+        "plan": 19370089.93,
+        "emg": 133681.35,
+        "emg_energy": 34593.55,
+        "emg_intervals": 1006,
+        "emg_share": 0.006854
       }
     },
-    "argmin_total_quantile": 90,
-    "argmin_total": 14461289.17,
-    "baseline_q80_total": 14559104.58
+    "argmin_total_quantile": 80,
+    "argmin_total": 17741097.14,
+    "baseline_q80_total": 17741097.14
   },
   "R2_window": {
     "3天均匀": {
-      "total": 14598674.81,
-      "plan": 13089138.97,
-      "emg": 1509535.85,
-      "emg_energy": 386693.75,
-      "emg_intervals": 11534,
-      "emg_share": 0.103402
+      "total": 20226034.85,
+      "plan": 18194143.97,
+      "emg": 2031890.88,
+      "emg_energy": 519129.45,
+      "emg_intervals": 10289,
+      "emg_share": 0.100459
     },
     "5天均匀": {
-      "total": 14589673.55,
-      "plan": 13009609.25,
-      "emg": 1580064.3,
-      "emg_energy": 403668.8,
-      "emg_intervals": 12023,
-      "emg_share": 0.1083
+      "total": 17979113.74,
+      "plan": 16307946.9,
+      "emg": 1671166.84,
+      "emg_energy": 423769.72,
+      "emg_intervals": 11156,
+      "emg_share": 0.09295
     },
     "7天均匀": {
-      "total": 14660223.93,
-      "plan": 12969445.14,
-      "emg": 1690778.79,
-      "emg_energy": 430646.62,
-      "emg_intervals": 12368,
-      "emg_share": 0.115331
+      "total": 16875313.78,
+      "plan": 15206593.36,
+      "emg": 1668720.41,
+      "emg_energy": 422630.96,
+      "emg_intervals": 11399,
+      "emg_share": 0.098885
     },
     "7天加权(基准)": {
-      "total": 14559104.58,
-      "plan": 13008179.66,
-      "emg": 1550924.93,
-      "emg_energy": 396939.32,
-      "emg_intervals": 11977,
-      "emg_share": 0.106526
+      "total": 17741097.14,
+      "plan": 15739922.23,
+      "emg": 2001174.91,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112799
     },
     "14天均匀": {
-      "total": 15251373.61,
-      "plan": 13456071.69,
-      "emg": 1795301.92,
-      "emg_energy": 460029.56,
-      "emg_intervals": 11356,
-      "emg_share": 0.117714
+      "total": 17388171.48,
+      "plan": 15619040.75,
+      "emg": 1769130.74,
+      "emg_energy": 449233.48,
+      "emg_intervals": 10614,
+      "emg_share": 0.101743
     }
   },
   "R3_efficiency": {
     "eta_single_0.9_roundtrip_0.81": {
-      "total": 14559104.58,
-      "plan": 13008179.66,
-      "emg": 1550924.93,
-      "emg_energy": 396939.32,
-      "emg_intervals": 11977,
-      "emg_share": 0.106526
+      "total": 17741097.14,
+      "plan": 15739922.23,
+      "emg": 2001174.91,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112799
     },
     "eta_sqrt0.9_roundtrip_0.90": {
-      "total": 14092449.45,
-      "plan": 12546377.91,
-      "emg": 1546071.54,
-      "emg_energy": 395229.81,
-      "emg_intervals": 11955,
-      "emg_share": 0.109709
+      "total": 17203867.05,
+      "plan": 15206088.02,
+      "emg": 1997779.03,
+      "emg_energy": 493248.0,
+      "emg_intervals": 10837,
+      "emg_share": 0.116124
     }
   },
   "R4_price": {
     "price_x0.90": {
-      "total": 13103273.13,
-      "plan": 11707361.69,
-      "emg": 1395911.44,
-      "emg_energy": 396989.69,
-      "emg_intervals": 11977,
-      "emg_share": 0.106532
+      "total": 15966987.43,
+      "plan": 14165930.01,
+      "emg": 1801057.42,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112799
     },
     "price_x0.95": {
-      "total": 13831263.52,
-      "plan": 12357770.68,
-      "emg": 1473492.85,
-      "emg_energy": 396996.49,
-      "emg_intervals": 11977,
-      "emg_share": 0.106533
+      "total": 16854042.28,
+      "plan": 14952926.12,
+      "emg": 1901116.16,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112799
     },
     "price_x1.00": {
-      "total": 14559104.58,
-      "plan": 13008179.66,
-      "emg": 1550924.93,
-      "emg_energy": 396939.32,
-      "emg_intervals": 11977,
-      "emg_share": 0.106526
+      "total": 17741097.14,
+      "plan": 15739922.23,
+      "emg": 2001174.91,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112799
     },
     "price_x1.05": {
-      "total": 15287059.81,
-      "plan": 13658588.64,
-      "emg": 1628471.17,
-      "emg_energy": 396939.32,
-      "emg_intervals": 11977,
-      "emg_share": 0.106526
+      "total": 18628152.0,
+      "plan": 16526918.35,
+      "emg": 2101233.65,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112799
     },
     "price_x1.10": {
-      "total": 16015015.04,
-      "plan": 14308997.62,
-      "emg": 1706017.42,
-      "emg_energy": 396939.32,
-      "emg_intervals": 11977,
-      "emg_share": 0.106526
+      "total": 19515206.85,
+      "plan": 17313914.46,
+      "emg": 2201292.4,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112799
     }
   },
   "R5_terminal": {
     "daily_cycle_S144_eq_S0": {
-      "total": 14559104.58,
-      "plan": 13008179.66,
-      "emg": 1550924.93,
-      "emg_energy": 396939.32,
-      "emg_intervals": 11977,
-      "emg_share": 0.106526
+      "total": 17741097.14,
+      "plan": 15739922.23,
+      "emg": 2001174.91,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112799
     },
     "free_terminal": {
-      "total": 14567758.84,
-      "plan": 13016833.92,
-      "emg": 1550924.93,
-      "emg_energy": 396939.32,
-      "emg_intervals": 11977,
-      "emg_share": 0.106463
+      "total": 17763825.96,
+      "plan": 15762651.06,
+      "emg": 2001174.91,
+      "emg_energy": 493945.0,
+      "emg_intervals": 10842,
+      "emg_share": 0.112654
     }
   },
   "meta": {
     "question_id": "Q2",
-    "model": "M2-daily-rolling-LP+self-forecast+risk-correction(q80,dow-bucketed)",
+    "model": "M2-daily-rolling-LP+self-forecast+risk-correction(q80)",
     "seed": 2026,
-    "generated_at": "2026-09-11T21:15:47.780566",
+    "generated_at": "2026-09-12T05:33:03.279646",
     "report_period": "2025-02-01 ~ 2025-12-31",
     "data_source": "data_clean/cleaned_data.pkl"
   }

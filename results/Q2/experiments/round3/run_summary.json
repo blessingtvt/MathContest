@@ -5,7 +5,7 @@
   "method": "M2-daily-rolling-LP+netload-self-forecast+risk-correction(q80)",
   "seed": 2026,
   "status": "success",
-  "created_at": "2026-09-11T16:26:40.343225",
+  "created_at": "2026-09-12T05:31:10.065772",
   "data_sources": [
     "data_clean/cleaned_data.pkl"
   ],
