@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "experiment_id": "E4-1",
+  "purpose": "风险修正分位是否需价格加权（等权 q80 vs 价格加权 q80）",
+  "created_at": "2026-09-12T21:02:21.490758",
+  "seed": 2026,
+  "quantile": 80.0,
+  "result4_2": {
+    "equal_weight": 15231785.59,
+    "price_weighted": 15204421.88,
+    "delta": -27363.71,
+    "delta_pct": -0.1796
+  },
+  "result4_3": {
+    "equal_weight": 14694112.99,
+    "price_weighted": 14690911.89,
+    "delta": -3201.09,
+    "delta_pct": -0.0218
+  },
+  "status": "PASS",
+  "verdict": "价格加权与等权 q=80 的差异极小，印证报童临界比 0.8 不随电价缩放；等权 80 分位在波动电价下仍近最优，无需价格加权。"
+}

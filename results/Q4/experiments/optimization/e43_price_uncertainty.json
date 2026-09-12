@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "experiment_id": "E4-3",
+  "purpose": "电价不确定性成本（C1 备选：日前已知 vs 因果自预报）",
+  "created_at": "2026-09-12T21:04:08.801938",
+  "seed": 2026,
+  "price_forecast_model": "p̂_{d,t} = p1_t × m̂_d, m̂_d = 历史同星期乘子均值(因果扩张窗口, MIN_HIST=7)",
+  "result4_2": {
+    "price_known": 15231785.59,
+    "price_forecast": 15368957.62,
+    "uncertainty_cost": 137172.03,
+    "pct": 0.9006
+  },
+  "result4_3": {
+    "price_known": 14694112.99,
+    "price_forecast": 14811158.43,
+    "uncertainty_cost": 117045.44,
+    "pct": 0.7965
+  },
+  "status": "PASS",
+  "verdict": "电价预测误差成本有限，验证 C1'电价视为已知'假设对结论影响小；与 Q2 净负荷自预报、Q3 光伏预报共同构成三重不确定性叙事。"
+}

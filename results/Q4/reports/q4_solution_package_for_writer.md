@@ -35,10 +35,12 @@
 3. **波动电价放大储能套利（+2.0%）但更放大预报误差损失（+3.8%）并抬升基础用电成本（+3.8%）**，净总成本 +4.6%。
 4. **q=80 设计值稳健**：result4-2 偏离最优 0.69%，result4-3 块级偏离 argmin q=85 仅 0.18%（报童临界比 0.8 不随电价缩放，故 q=80 作冻结主值）。
 5. **跨日套利价值仅 4.96 万元/年**（E4-2，`experiments/optimization/e42_crossday_arbitrage.json`）：日闭合约束成本 49,603.10 元对应"廉价周末（周六末储能 9376 kWh）充电、昂贵工作日（周四末 1465 kWh）放空"的跨日价差；可执行层逐日滚动仅单日前瞻，自由结转反而更贵（+1.0~1.1 万元），故日闭合是滚动模型的有益正则。
+6. **日间波动幅度单调抬升成本**（E4-6，`experiments/optimization/e46_volatility_sweep.json`）：$p^{(k)}=p^{(1)}_t+k(p_{d,t}-p^{(1)}_t)$ 下总成本随 k 单调上升，k=0 精确回到 Q2=14,559,104.58 / Q3块级=14,049,999.28（口径对齐自检 ✓）；根源是 TOU 电价与负荷正相关 corr=+0.508。
+7. **极端低价（0.0076 元）不引起解退化**（E4-7，`experiments/optimization/e47_extreme_low_price_check.json`）：储能/充放电越界 0 次、无充放同时、紧急与弃光互斥；12 个极端低价日做"电价下限 0.1 元"对照弃光率变化恒为 0，证明弃光率与电价无关（弃光源于预报风险修正的保守超购）；极端低价日弃光率偏高（日弃光率等权均值 31.6%，全报告期 13.2%）系低负荷日光伏过剩的结构性结果，fallback F4 未触发。
 
 ## 4. 图与表
 
-- 图：`paper/figures/fig_q4_1_cost_comparison.png`、`fig_q4_2_cost_decomposition.png`、`fig_q4_3_quantile_sensitivity.png`（计划见 `methods/Q4/q4_figure_table_plan.md`）。
+- 图（7 幅，全部 300dpi PNG + SVG）：`fig_q4_1_cost_comparison`、`fig_q4_2_cost_decomposition`、`fig_q4_3_quantile_sensitivity`、`fig_q4_4_adjustment_value`、`fig_q4_5_price_trend`、`fig_q4_6_volatility_sensitivity`、`fig_q4_7_price_forecast_uncertainty`（计划见 `methods/Q4/q4_figure_table_plan.md`）。
 - 表：见 figure_table_plan 的 tab_q4_* 四项（值全部在冻结文件）。
 
 ## 5. 局限（写手须如实声明）

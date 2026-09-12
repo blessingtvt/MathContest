@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "question_id": "Q4",
+  "experiment_id": "E4-6",
+  "purpose": "日间电价波动幅度稳健性（锚定附件1固定曲线，缩放日间水平波动）",
+  "created_at": "2026-09-12T20:53:44.493542",
+  "seed": 2026,
+  "transformation": "p^{(k)}_{d,t} = p1_t + k*(p4_{d,t} - p1_t); k=0→附件1(恒定日曲线), k=1→附件4",
+  "mean_price_each_k": 0.7662,
+  "k_sweep": {
+    "0.0": {
+      "result4_2": 14559104.58,
+      "result4_3": 14049999.28,
+      "negative_price_intervals_clipped": 0
+    },
+    "0.5": {
+      "result4_2": 14918030.19,
+      "result4_3": 14389962.93,
+      "negative_price_intervals_clipped": 0
+    },
+    "1.0": {
+      "result4_2": 15231785.59,
+      "result4_3": 14694112.99,
+      "negative_price_intervals_clipped": 0
+    },
+    "1.5": {
+      "result4_2": 15494618.71,
+      "result4_3": 14933571.17,
+      "negative_price_intervals_clipped": 115
+    },
+    "2.0": {
+      "result4_2": 15710265.35,
+      "result4_3": 15121660.38,
+      "negative_price_intervals_clipped": 494
+    }
+  },
+  "k0_check": {
+    "result4_2": {
+      "expected_Q2": 14559104.58,
+      "got": 14559104.58,
+      "pass": true
+    },
+    "result4_3": {
+      "expected_Q3_block": 14049999.28,
+      "got": 14049999.28,
+      "pass": true
+    }
+  },
+  "monotonic_increasing": {
+    "result4_2": true,
+    "result4_3": true
+  },
+  "status": "PASS",
+  "verdict": "日间波动幅度越大，总购电费越高（TOU 电价与负荷正相关 corr=+0.508，高价日恰为高负荷日，波动放大抬升基础用电成本）；k=0 精确回到 Q2/Q3 冻结值，验证口径对齐。",
+  "note": "与 R2(robustness) 的区别：R2 用标量均值 mean_p 锚定（k=0 为无日内结构的平坦价 17.17M，回答'总价差→套利空间'）；本 E4-6 锚定附件1 曲线（k=0 为恒定日曲线 Q2/Q3），孤立'日间波动幅度'这一个 Q4 专属变量。"
+}
