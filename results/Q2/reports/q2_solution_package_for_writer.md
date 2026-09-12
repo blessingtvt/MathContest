@@ -40,6 +40,7 @@
 | 分桶前后对比 | `paper/figures/fig_q2_7_dow_bucket_effect.png` | 论文正式(3) |
 | 储能日充放 | `paper/figures/fig_q2_8_storage_daily.png` | 附录(4) |
 | 随机规划尾部风险 | `paper/figures/fig_q2_9_stochastic_risk.png` | 论文正式(3) |
+| 随机规划削峰时序 | `paper/figures/fig_q2_10_stochastic_timeseries.png` | 论文正式(3) |
 | 指定日期结果表 | `results/Q2/q2_answer_tables.md` | 论文正式(3) |
 | 主结果表 | `results/Q2/reports/frozen_numbers.json` | 论文正式(3) |
 
