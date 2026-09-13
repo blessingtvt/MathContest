@@ -4,7 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3205259-df34-4b4b-bb26-7142e951bb0d" name="Changes" comment="" />
+    <list default="true" id="c3205259-df34-4b4b-bb26-7142e951bb0d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/make_figures.py" beforeDir="false" afterPath="$PROJECT_DIR$/make_figures.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/~$附件1.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件1.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件2.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件3.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件4.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件5/result1.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件5/result2.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件5/result3.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件5/result4-2.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../附件/附件5/result4-3.xlsx" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,22 +41,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.make_figures.executor&quot;: &quot;Run&quot;,
-    &quot;Python.make_q2_figures_round3.executor&quot;: &quot;Run&quot;,
-    &quot;Python.图.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.make_figures.executor": "Run",
+    "Python.make_q2_figures_round3.executor": "Run",
+    "Python.q1_main.executor": "Run",
+    "Python.q3_4_adjust_ablation.executor": "Run",
+    "Python.图.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -68,7 +83,7 @@
       <workItem from="1789116692533" duration="8941000" />
       <workItem from="1789189954695" duration="597000" />
       <workItem from="1789205298682" duration="3135000" />
-      <workItem from="1789226301611" duration="15000" />
+      <workItem from="1789226301611" duration="3686000" />
     </task>
     <servers />
   </component>
@@ -76,8 +91,10 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/make_figures_py$q1_main.coverage" NAME="q1_main Coverage Results" MODIFIED="1789282801164" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../附录/code" />
     <SUITE FILE_PATH="coverage/make_figures_py$.coverage" NAME="图 Coverage Results" MODIFIED="1789207662072" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/make_figures_py$make_figures.coverage" NAME="make_figures Coverage Results" MODIFIED="1789205902901" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/make_figures_py$make_figures.coverage" NAME="make_figures Coverage Results" MODIFIED="1789277129194" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/make_figures_py$q3_4_adjust_ablation.coverage" NAME="q3_4_adjust_ablation Coverage Results" MODIFIED="1789277794774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/make_figures_py$make_q2_figures_round3.coverage" NAME="make_q2_figures_round3 Coverage Results" MODIFIED="1789131426965" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../Q2" />
     <SUITE FILE_PATH="coverage/clean_data_py$make_figures.coverage" NAME="make_figures Coverage Results" MODIFIED="1789057429785" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
