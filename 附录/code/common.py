@@ -462,7 +462,10 @@ def rebuild_charge_sheet(ws, dates, C, Q, E):
             lo, hi = s * 24, (s + 1) * 24
             chg = float(C[d, lo:hi].sum())
             dis = float(Q[d, lo:hi].sum())
-            ws.cell(row=r, column=1, value=dates[d] if s == 0 else None)
+            if s == 0:
+                ws.cell(row=r, column=1, value=dates[d]).number_format = "mm-dd-yy"
+            else:
+                ws.cell(row=r, column=1, value=None)
             ws.cell(row=r, column=2, value=SEG_LABELS[s])
             ws.cell(row=r, column=3, value=chg)
             ws.cell(row=r, column=4, value=dis)
@@ -485,12 +488,12 @@ def rebuild_emergency_sheet(ws, dates, Z, labels):
     for d in range(REPORT_DAYS):
         for t in range(T):
             if Z[d, t] > 1e-8:
-                ws.cell(row=r, column=1, value=dates[d])
+                ws.cell(row=r, column=1, value=dates[d]).number_format = "mm-dd-yy"
                 ws.cell(row=r, column=2, value=labels[t])
                 ws.cell(row=r, column=3, value=float(Z[d, t]))
                 r += 1
     # 若全年无紧急购电(完美预见), 保留一行占位说明
     if r == 2:
-        ws.cell(row=2, column=1, value=dates[0])
+        ws.cell(row=2, column=1, value=dates[0]).number_format = "mm-dd-yy"
         ws.cell(row=2, column=2, value="无")
         ws.cell(row=2, column=3, value=0.0)
